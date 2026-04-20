@@ -1,24 +1,20 @@
-# Process Mining Logger Requirements
-# Основные зависимости для работы системы логирования процессов
-
-# Стандартная библиотека Python (встроенные модули)
-# - json (встроенный)
-# - csv (встроенный)
-# - datetime (встроенный)
-# - typing (встроенный)
-# - pathlib (встроенный)
-# - uuid (встроенный)
-
-# Для разработки и тестирования
-unittest-xml-reporting>=3.2.0
-coverage>=7.0.0
-
-# Дополнительные библиотеки для улучшенного анализа
-pandas>=2.0.0          # Для анализа CSV логов
-matplotlib>=3.7.0      # Для визуализации процессов
-seaborn>=0.12.0        # Для улучшенной визуализации
-plotly>=5.15.0         # Для интерактивных графиков
-
-# Для веб-дашбордов (опционально)
-dash>=2.11.0           # Для создания веб-интерфейса
-flask>=2.3.0           # Альтернативный веб-фреймворк
+click>=8.1.0
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pyyaml>=6.0
+ollama>=0.4.0
+langchain>=0.3.0
+langchain-community>=0.3.0
+chromadb>=0.5.0
+sentence-transformers>=2.2.0
+faiss-cpu>=1.8.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+tavily-python>=0.3.0
+duckduckgo-search>=6.0.0
+pypdf>=4.0.0
+python-docx>=1.1.0
+markdown>=3.5.0
+pandas>=2.0.0
+openpyxl>=3.1.0
+pytest>=8.0.0

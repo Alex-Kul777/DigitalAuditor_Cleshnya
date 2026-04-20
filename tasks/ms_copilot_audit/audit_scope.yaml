@@ -1,0 +1,79 @@
+# Цели и задачи аудита Microsoft Copilot Chat
+audit_objectives:
+  primary: "Оценка процессов разработки и контроля качества ИИ-агента GitHub Copilot Chat"
+  secondary:
+    - "Проверка соответствия стандартам безопасной разработки ИИ"
+    - "Анализ рисков цепочки поставок"
+    
+audit_tasks:
+  - id: TASK-001
+    name: "Анализ системных промптов агента"
+    description: "Проверка промптов на предмет безопасности и предотвращения инъекций"
+    rag_queries:
+      - "system prompt security"
+      - "prompt injection prevention"
+    standards:
+      - "OWASP LLM01: Prompt Injection"
+      - "CISA AI Risk Assessment"
+      
+  - id: TASK-002
+    name: "Проверка политик конфиденциальности"
+    description: "Анализ того, какие данные отправляются в LLM"
+    rag_queries:
+      - "telemetry data collection"
+      - "privacy policy compliance"
+    standards:
+      - "GDPR Article 35"
+      - "ISO 27701"
+      
+  - id: TASK-003
+    name: "Оценка тестового покрытия"
+    description: "Анализ наличия и качества юнит-тестов и интеграционных тестов"
+    rag_queries:
+      - "test coverage agent logic"
+      - "unit tests for AI features"
+    standards:
+      - "CISA Testing Standards"
+      - "ISTQB AI Testing"
+      
+  - id: TASK-004
+    name: "Анализ обработки ошибок и логирования"
+    description: "Проверка наличия аудиторского следа в коде"
+    rag_queries:
+      - "error handling best practices"
+      - "audit logging requirements"
+    standards:
+      - "CISA Audit Trail Requirements"
+      - "ISO 27001 A.12.4"
+      
+  - id: TASK-005
+    name: "Выявление рисков цепочки поставок"
+    description: "Сканирование зависимостей на предмет уязвимостей"
+    rag_queries:
+      - "supply chain security npm"
+      - "CVE vulnerabilities"
+    standards:
+      - "NIST SP 800-218"
+      - "SLSA Framework"
+
+swot_analysis:
+  strengths:
+    - "Доступ к исходному коду открытого репозитория"
+    - "Высокая скорость анализа через RAG"
+    - "Соответствие шаблонам CISA"
+    - "Доказательная база со ссылками на код"
+    
+  weaknesses:
+    - "Ограниченность контекста (только клиентская часть)"
+    - "Зависимость от качества интерпретации кода LLM"
+    - "Отсутствие возможности опроса разработчиков"
+    
+  opportunities:
+    - "Демонстрация компетенций ИИ-аудита"
+    - "Потенциальное обнаружение уязвимостей"
+    - "Масштабирование методологии на другие проекты"
+    
+  threats:
+    - "Юридические риски некорректной интерпретации"
+    - "Быстрое устаревание отчета"
+    - "Конкуренция в области ИИ-аудита"

@@ -1,0 +1,6 @@
+total_time: "13 минут"
+chunks: 1096
+findings: 5
+coverage: "100%"
+model: "qwen2.5:0.5b-instruct"
+rag_documents: ["Мёртвые души", "Стандарты CISA", "716-П"]
