@@ -1,21 +1,46 @@
-import logging
-import sys
-from core.config import LOG_LEVEL, LOG_FILE
+"""
+Logger setup for DigitalAuditor Cleshnya.
 
-def setup_logger(name: str) -> logging.Logger:
+Uses DualLogHandler for simultaneous text and JSON logging.
+"""
+import logging
+from pathlib import Path
+
+from core.config import LOG_LEVEL, LOG_FILE
+from core.logging_utils import DualLogHandler
+
+
+def setup_logger(name: str, json_output: bool = False) -> logging.Logger:
+    """
+    Set up logger with contextual formatting.
+
+    Args:
+        name: Logger name (typically module name or "main.component")
+        json_output: Enable JSON file output for process mining
+
+    Returns:
+        Configured logger instance
+    """
     logger = logging.getLogger(name)
-    logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
-    
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+    # Skip reconfiguration if already configured
+    if logger.handlers:
+        return logger
+
+    # Ensure logs directory exists
+    log_path = Path(LOG_FILE)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Set up dual handlers (text + optional JSON)
+    json_file = None
+    if json_output:
+        json_file = str(log_path.parent / "audit.json")
+
+    DualLogHandler.setup(
+        logger=logger,
+        log_file=LOG_FILE,
+        json_file=json_file,
+        level=LOG_LEVEL,
     )
-    
-    file_handler = logging.FileHandler(LOG_FILE, encoding='utf-8')
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-    
+
     return logger
