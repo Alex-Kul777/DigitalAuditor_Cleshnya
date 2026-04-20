@@ -5,6 +5,36 @@ All notable changes to DigitalAuditor Cleshnya will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-20 (Phase 3 Complete)
+
+### Added
+
+#### Phase 3: Polish & Documentation
+- **Development Guides**:
+  - `docs/development/LOGGING_GUIDE.md` (400+ lines): Advanced logging patterns, LogContext, PipelineTimer, process mining
+  - `docs/development/TESTING.md` (350+ lines): Test writing guide, fixtures, mocking patterns, CI/CD integration
+  - `docs/development/TROUBLESHOOTING.md` (350+ lines): Solutions for Ollama, ChromaDB, config, logging, performance issues
+
+- **Extended Test Coverage**:
+  - `tests/unit/test_knowledge.py`: 170+ tests for DocumentFetcher, VectorIndexer, Retriever
+  - `tests/unit/test_report_generator.py`: 130+ tests for ReportOrchestrator, report structure, findings aggregation
+  - Knowledge module: Multilingual support, edge cases, document persistence
+  - Report generation: Multiple formats (Markdown, JSON), evidence linking, risk categorization
+
+- **Total Coverage**: 54% achieved (Phase 3 target)
+  - Phase 1: Core modules (config, logger, validator, exceptions) - 250+ tests
+  - Phase 2: Agents, tools, infrastructure - 165+ tests
+  - Phase 3: Knowledge, report generation - 300+ tests
+  - **Total**: 715+ unit tests + 45 smoke tests = 760+ total tests
+
+### Improved
+
+- Documentation structure: Added development guides for operational support
+- Test coverage: Extended to cover knowledge base and report generation
+- Process mining: Comprehensive logging guide for audit trail analysis
+
+---
+
 ## [1.0.0] - 2026-04-20
 
 ### Added
