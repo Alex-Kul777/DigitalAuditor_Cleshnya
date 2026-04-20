@@ -75,15 +75,63 @@ def env_testing(monkeypatch, tmp_path):
 
 @pytest.fixture
 def mock_ollama_llm():
-    """Mock Ollama LLM instance."""
+    """Mock Ollama LLM instance for unit tests."""
     mock_llm = MagicMock()
+
+    # Mock invoke method (langchain compatible)
     mock_llm.invoke = MagicMock(
-        return_value="Test response from Ollama"
+        return_value="Test audit response from mock Ollama"
     )
+
+    # Mock predict method
     mock_llm.predict = MagicMock(
         return_value="Test prediction"
     )
+
+    # Mock call method (__call__)
+    mock_llm.__call__ = MagicMock(
+        return_value="Test audit response"
+    )
+
+    # Add model name
+    mock_llm.model = "digital-auditor-cisa"
+
     return mock_llm
+
+
+@pytest.fixture
+def mock_audit_config(sample_audit_config, monkeypatch):
+    """Mock audit configuration with testing profile."""
+    from core.config import AuditConfig, OllamaConfig, KnowledgeConfig, LoggingConfig
+    from pathlib import Path
+
+    monkeypatch.setenv("AUDIT_PROFILE", "testing")
+
+    ollama_config = OllamaConfig(
+        base_url="http://localhost:11434",
+        model="digital-auditor-cisa",
+        timeout_seconds=5,
+        max_retries=1,
+    )
+
+    knowledge_config = KnowledgeConfig(
+        raw_docs_path=Path("knowledge/raw_docs"),
+        vector_store_path=Path(".chroma_test_db"),
+        embedding_model="paraphrase-multilingual-MiniLM-L12-v2",
+    )
+
+    logging_config = LoggingConfig(
+        log_file="test.log",
+        log_level="WARNING",
+        json_output=False,
+    )
+
+    return AuditConfig(
+        ollama=ollama_config,
+        knowledge=knowledge_config,
+        logging=logging_config,
+        profile="testing",
+    )
 
 
 @pytest.fixture
