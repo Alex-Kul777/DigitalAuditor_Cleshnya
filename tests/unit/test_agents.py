@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 from agents.base import BaseAgent
-from agents.cisa_auditor import CISAAuditor, SYSTEM_PROMPT
+from agents.cisa_auditor import CisaAuditor, SYSTEM_PROMPT
 
 
 class TestBaseAgent:
@@ -50,22 +50,22 @@ class TestBaseAgent:
                 mock_logger.assert_called_once_with("agent.test_agent")
 
 
-class TestCISAAuditor:
-    """Test CISAAuditor agent."""
+class TestCisaAuditor:
+    """Test CisaAuditor agent."""
 
     def test_cisa_auditor_initialization(self, mock_ollama_llm):
-        """Test CISAAuditor initialization."""
+        """Test CisaAuditor initialization."""
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
                 assert auditor.name == "cisa_auditor"
                 assert auditor.llm is not None
 
     def test_cisa_auditor_execute(self, mock_ollama_llm):
-        """Test CISAAuditor.execute() method."""
+        """Test CisaAuditor.execute() method."""
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
                 result = auditor.execute("проверить ИТ-безопасность")
 
                 # Verify invoke was called with prompt containing system prompt and task
@@ -75,10 +75,10 @@ class TestCISAAuditor:
                 assert "проверить ИТ-безопасность" in called_prompt
 
     def test_cisa_auditor_generate_section(self, mock_ollama_llm):
-        """Test CISAAuditor.generate_section() method."""
+        """Test CisaAuditor.generate_section() method."""
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
                 result = auditor.generate_section("Опишите архитектуру безопасности")
 
                 # Verify invoke was called with system prompt and section prompt
@@ -88,12 +88,12 @@ class TestCISAAuditor:
                 assert "Опишите архитектуру безопасности" in called_prompt
 
     def test_cisa_auditor_uses_correct_model(self):
-        """Test that CISAAuditor uses correct model and temperature."""
+        """Test that CisaAuditor uses correct model and temperature."""
         with patch("agents.cisa_auditor.OllamaLLM") as mock_ollama_class:
             with patch("agents.base.setup_logger"):
                 with patch("agents.cisa_auditor.OLLAMA_BASE_URL", "http://localhost:11434"):
                     with patch("agents.cisa_auditor.OLLAMA_MODEL", "digital-auditor-cisa"):
-                        auditor = CISAAuditor()
+                        auditor = CisaAuditor()
 
                         # Verify OllamaLLM was called with correct parameters
                         mock_ollama_class.assert_called_once()
@@ -114,7 +114,7 @@ class TestCISAAuditor:
         """Test multiple executions with different tasks."""
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
 
                 task1 = "проверить доступы"
                 task2 = "проверить логирование"
@@ -138,7 +138,7 @@ class TestAgentLLMInteraction:
         """Test that agent calls llm.invoke() method."""
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
                 auditor.execute("test task")
 
                 # Verify that invoke was called
@@ -151,7 +151,7 @@ class TestAgentLLMInteraction:
 
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
                 result = auditor.execute("test task")
 
                 assert result == expected_response
@@ -162,7 +162,7 @@ class TestAgentLLMInteraction:
 
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
                 result = auditor.execute("test task")
 
                 assert result == ""
@@ -174,7 +174,7 @@ class TestAgentLLMInteraction:
 
         with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
-                auditor = CISAAuditor()
+                auditor = CisaAuditor()
                 result = auditor.execute("test task")
 
                 assert result == long_response
@@ -190,8 +190,8 @@ class TestAgentMarker:
         assert BaseAgent is not None
 
     def test_cisa_auditor_exists(self):
-        """Test that CISAAuditor class exists."""
-        assert CISAAuditor is not None
+        """Test that CisaAuditor class exists."""
+        assert CisaAuditor is not None
 
     def test_system_prompt_is_defined(self):
         """Test that SYSTEM_PROMPT is defined."""
