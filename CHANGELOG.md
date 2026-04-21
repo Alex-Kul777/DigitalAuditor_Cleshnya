@@ -5,6 +5,29 @@ All notable changes to DigitalAuditor Cleshnya will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2026-04-21
+
+### Fixed
+
+- **Configuration Validation**: Fixed gogol_audit config - changed invalid audit_type 'forensic' to 'security'
+- **Test Mocking**: Fixed test_agents.py - corrected mock targets to use get_llm instead of non-existent OllamaLLM
+- **Test Mocking**: Fixed test_knowledge.py (25 tests) - corrected mocks for HuggingFaceEmbeddings and setup_logger
+- **Smoke Tests**: Fixed CisaAuditor class name reference (was CISAAuditor)
+
+### Added
+
+- **Configuration Tests**: New test_config_validation.py with 6 unit tests for audit_type validation
+- **Task Configuration**: Added missing config.yaml for ms_copilot_audit task
+- **Dependencies**: Added explicit langchain-chroma>=0.3.0 dependency
+- **Environment**: Added HF_TOKEN to .env.example for HuggingFace authentication
+
+### Improved
+
+- **Permissions**: Added permanent pytest permission to project settings (no prompt required)
+- **Test Coverage**: Unit tests now 48+ passing (agents, knowledge, config, CLI options)
+
+---
+
 ## [1.1.0] - 2026-04-20 (Phase 3 Complete)
 
 ### Added
