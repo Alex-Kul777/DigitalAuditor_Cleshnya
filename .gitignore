@@ -51,3 +51,8 @@ audit.log
 # OS
 .DS_Store
 Thumbs.db
+
+# Temporary files
+tmp/
+audit.json
+test_gigachat_speed.py
