@@ -212,6 +212,23 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 LOG_FILE = os.getenv("LOG_FILE", "audit.log")
 
+# LLM Provider Configuration
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "hybrid")
+
+# GigaChat Configuration
+GIGACHAT_API_KEY = os.getenv("GIGACHAT_API_KEY", "")
+GIGACHAT_SCOPE = os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_B2B")
+GIGACHAT_MODEL = os.getenv("GIGACHAT_MODEL", "GigaChat-2-Max")
+GIGACHAT_MAX_TOKENS = int(os.getenv("GIGACHAT_MAX_TOKENS", "2000"))
+GIGACHAT_TIMEOUT = int(os.getenv("GIGACHAT_TIMEOUT", "60"))
+GIGACHAT_MAX_RETRIES = int(os.getenv("GIGACHAT_MAX_RETRIES", "3"))
+
+# Claude/Anthropic Configuration
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+
+# OpenAI Configuration
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 KNOWLEDGE_RAW_DOCS = PROJECT_ROOT / "knowledge" / "raw_docs"
 CHROMA_DB_PATH = PROJECT_ROOT / "chroma_db"
 EMBEDDING_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"

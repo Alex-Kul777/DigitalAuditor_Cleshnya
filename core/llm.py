@@ -1,10 +1,126 @@
-from langchain_ollama import OllamaLLM
-from core.config import OLLAMA_BASE_URL, OLLAMA_MODEL
+import os
+from core.logger import setup_logger
+
+logger = setup_logger("llm")
+
+
+class GigaChatWrapper:
+    def __init__(self, api_key: str, model: str, temperature: float = 0.3, timeout: int = 60, max_retries: int = 3, scope: str = "GIGACHAT_API_B2B"):
+        from core.gigachat_client import GigaChatClient
+        self.client = GigaChatClient(api_key=api_key, model=model, max_retries=max_retries, timeout=timeout, scope=scope)
+        self.temperature = temperature
+
+    def invoke(self, prompt: str) -> str:
+        response = self.client.invoke(prompt)
+        if response is None:
+            raise RuntimeError("GigaChat failed and no fallback available")
+        return response
+
+
+class LLMFactory:
+    _gigachat_available = None
+
+    @classmethod
+    def _check_gigachat(cls) -> bool:
+        if cls._gigachat_available is None:
+            from core.gigachat_validator import GigaChatValidator
+            validator = GigaChatValidator()
+            cls._gigachat_available = validator.is_available()
+            if cls._gigachat_available:
+                logger.info("GigaChat is available")
+            else:
+                logger.info("GigaChat is not available")
+        return cls._gigachat_available
+
+    @classmethod
+    def get_llm(cls, temperature: float = 0.3):
+        provider = os.getenv("LLM_PROVIDER", "hybrid").lower()
+
+        if provider == "hybrid":
+            if cls._check_gigachat():
+                provider = "gigachat"
+            else:
+                provider = "ollama"
+
+        logger.info(f"Selected LLM provider: {provider}")
+
+        if provider == "gigachat":
+            return cls._get_gigachat(temperature)
+        elif provider == "anthropic":
+            return cls._get_anthropic(temperature)
+        elif provider == "openai":
+            return cls._get_openai(temperature)
+        else:
+            return cls._get_ollama(temperature)
+
+    @classmethod
+    def _get_gigachat(cls, temperature: float):
+        wrapper = GigaChatWrapper(
+            api_key=os.getenv("GIGACHAT_API_KEY"),
+            model=os.getenv("GIGACHAT_MODEL", "GigaChat-2-Max"),
+            temperature=temperature,
+            timeout=int(os.getenv("GIGACHAT_TIMEOUT", "60")),
+            max_retries=int(os.getenv("GIGACHAT_MAX_RETRIES", "3")),
+            scope=os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_B2B")
+        )
+
+        def invoke_with_fallback(prompt: str) -> str:
+            try:
+                return wrapper.invoke(prompt)
+            except Exception as e:
+                logger.info(f"GigaChat failed: {e}, falling back to Ollama")
+                ollama_llm = cls._get_ollama(temperature)
+                return ollama_llm.invoke(prompt)
+
+        from langchain_core.language_models.llms import BaseLLM
+        from langchain_core.callbacks import CallbackManagerForLLMRun
+        from typing import Optional, List, Any
+        from langchain_core.outputs import LLMResult, Generation
+        from pydantic import Field
+
+        class GigaChatLLMAdapter(BaseLLM):
+            temperature: float = Field(default=0.3)
+
+            def _generate(self, prompts: List[str], stop: Optional[List[str]] = None, run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs: Any) -> Any:
+                generations = []
+                for prompt in prompts:
+                    text = invoke_with_fallback(prompt)
+                    generations.append([Generation(text=text)])
+                return LLMResult(generations=generations)
+
+            def _llm_type(self) -> str:
+                return "gigachat-adapter"
+
+        return GigaChatLLMAdapter(temperature=temperature)
+
+    @classmethod
+    def _get_ollama(cls, temperature: float):
+        from langchain_ollama import OllamaLLM
+        return OllamaLLM(
+            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+            model=os.getenv("OLLAMA_MODEL", "digital-auditor-cisa"),
+            temperature=temperature,
+            num_ctx=8192
+        )
+
+    @classmethod
+    def _get_anthropic(cls, temperature: float):
+        from langchain_anthropic import ChatAnthropic
+        return ChatAnthropic(
+            model="claude-3-5-sonnet-20240620",
+            temperature=temperature,
+            api_key=os.getenv("ANTHROPIC_API_KEY")
+        )
+
+    @classmethod
+    def _get_openai(cls, temperature: float):
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            model="gpt-4o",
+            temperature=temperature,
+            api_key=os.getenv("OPENAI_API_KEY")
+        )
+
 
 def get_llm(temperature: float = 0.3):
-    return OllamaLLM(
-        base_url=OLLAMA_BASE_URL,
-        model=OLLAMA_MODEL,
-        temperature=temperature,
-        num_ctx=8192,
-    )
+    return LLMFactory.get_llm(temperature)

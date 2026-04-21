@@ -1,0 +1,47 @@
+audit_objectives:
+  primary: "Оценка процессов разработки и контроля качества ИИ-агента GitHub Copilot Chat"
+  secondary:
+    - "Проверка соответствия стандартам безопасной разработки ИИ"
+    - "Анализ рисков цепочки поставок"
+    
+audit_tasks:
+  - id: TASK-001
+    name: "Анализ системных промптов агента"
+    description: "Проверка промптов на предмет безопасности и предотвращения инъекций"
+    rag_queries:
+      - "system prompt security"
+      - "prompt injection prevention"
+    standards:
+      - "OWASP LLM01: Prompt Injection"
+      
+  - id: TASK-002
+    name: "Проверка политик конфиденциальности"
+    description: "Анализ того, какие данные отправляются в LLM"
+    rag_queries:
+      - "telemetry data collection"
+      - "privacy policy"
+    standards:
+      - "GDPR Article 35"
+      
+  - id: TASK-003
+    name: "Оценка тестового покрытия"
+    description: "Анализ наличия и качества юнит-тестов"
+    rag_queries:
+      - "test coverage"
+      - "unit tests"
+    standards:
+      - "CISA Testing Standards"
+
+swot_analysis:
+  strengths:
+    - "Доступ к исходному коду открытого репозитория"
+    - "Высокая скорость анализа через RAG"
+  weaknesses:
+    - "Ограниченность контекста (только клиентская часть)"
+    - "Зависимость от качества интерпретации кода LLM"
+  opportunities:
+    - "Демонстрация компетенций ИИ-аудита"
+    - "Потенциальное обнаружение уязвимостей"
+  threats:
+    - "Юридические риски некорректной интерпретации"
+    - "Быстрое устаревание отчета"
