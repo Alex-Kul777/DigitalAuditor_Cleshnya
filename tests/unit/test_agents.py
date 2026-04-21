@@ -55,7 +55,7 @@ class TestCisaAuditor:
 
     def test_cisa_auditor_initialization(self, mock_ollama_llm):
         """Test CisaAuditor initialization."""
-        with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
+        with patch("agents.cisa_auditor.get_llm", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
                 auditor = CisaAuditor()
                 assert auditor.name == "cisa_auditor"
@@ -63,7 +63,7 @@ class TestCisaAuditor:
 
     def test_cisa_auditor_execute(self, mock_ollama_llm):
         """Test CisaAuditor.execute() method."""
-        with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
+        with patch("agents.cisa_auditor.get_llm", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
                 auditor = CisaAuditor()
                 result = auditor.execute("проверить ИТ-безопасность")
@@ -76,7 +76,7 @@ class TestCisaAuditor:
 
     def test_cisa_auditor_generate_section(self, mock_ollama_llm):
         """Test CisaAuditor.generate_section() method."""
-        with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
+        with patch("agents.cisa_auditor.get_llm", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
                 auditor = CisaAuditor()
                 result = auditor.generate_section("Опишите архитектуру безопасности")
@@ -88,20 +88,14 @@ class TestCisaAuditor:
                 assert "Опишите архитектуру безопасности" in called_prompt
 
     def test_cisa_auditor_uses_correct_model(self):
-        """Test that CisaAuditor uses correct model and temperature."""
-        with patch("agents.cisa_auditor.OllamaLLM") as mock_ollama_class:
+        """Test that CisaAuditor uses get_llm with temperature 0.3."""
+        mock_llm = Mock()
+        with patch("agents.cisa_auditor.get_llm", return_value=mock_llm) as mock_get_llm:
             with patch("agents.base.setup_logger"):
-                with patch("agents.cisa_auditor.OLLAMA_BASE_URL", "http://localhost:11434"):
-                    with patch("agents.cisa_auditor.OLLAMA_MODEL", "digital-auditor-cisa"):
-                        auditor = CisaAuditor()
+                auditor = CisaAuditor()
 
-                        # Verify OllamaLLM was called with correct parameters
-                        mock_ollama_class.assert_called_once()
-                        call_kwargs = mock_ollama_class.call_args[1]
-                        assert call_kwargs["base_url"] == "http://localhost:11434"
-                        assert call_kwargs["model"] == "digital-auditor-cisa"
-                        assert call_kwargs["temperature"] == 0.3
-                        assert call_kwargs["num_ctx"] == 8192
+                # Verify get_llm was called with temperature=0.3
+                mock_get_llm.assert_called_once_with(temperature=0.3)
 
     def test_cisa_auditor_system_prompt_is_russian(self):
         """Test that CISA auditor uses Russian system prompt."""
@@ -112,7 +106,7 @@ class TestCisaAuditor:
 
     def test_cisa_auditor_multiple_executions(self, mock_ollama_llm):
         """Test multiple executions with different tasks."""
-        with patch("agents.cisa_auditor.OllamaLLM", return_value=mock_ollama_llm):
+        with patch("agents.cisa_auditor.get_llm", return_value=mock_ollama_llm):
             with patch("agents.base.setup_logger"):
                 auditor = CisaAuditor()
 

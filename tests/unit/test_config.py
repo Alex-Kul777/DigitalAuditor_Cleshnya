@@ -3,6 +3,7 @@ Unit tests for core.config module.
 """
 import os
 import sys
+import importlib
 from pathlib import Path
 import pytest
 from unittest.mock import patch
