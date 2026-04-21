@@ -22,6 +22,14 @@ build/
 *.swp
 *.swo
 
+# Claude Code / Tools
+.omc/
+.claude/session-*
+.claude/transcripts/
+.claude/plans/
+.claude/memories/
+.claude/worktrees/
+
 # Project specific
 chroma_db/
 vector_store/
