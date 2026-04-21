@@ -48,7 +48,7 @@ class TestImports:
     def test_import_agents_cisa_auditor(self):
         """Test importing agents.cisa_auditor."""
         from agents import cisa_auditor
-        assert cisa_auditor.CISAAuditor is not None
+        assert cisa_auditor.CisaAuditor is not None
 
     def test_import_tasks_base_task(self):
         """Test importing tasks.base_task."""
