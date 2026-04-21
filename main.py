@@ -47,9 +47,14 @@ def create(name: str, company: str, sources: tuple, audit_type: str):
 
 @cli.command()
 @click.option('--task', required=True, help='Название задачи')
-def run(task: str):
+@click.option('--llm-provider', default=None, help='LLM провайдер (ollama, gigachat, anthropic, openai)')
+@click.option('--llm-model', default=None, help='Модель LLM')
+@click.option('--debug-level', type=int, default=None, help='Уровень отладки (0-3)')
+def run(task: str, llm_provider: str, llm_model: str, debug_level: int):
     """Run an audit task with validation and error handling."""
     try:
+        import os
+
         task_dir = Path(f"tasks/instances/{task}")
 
         # Check if task exists
@@ -57,18 +62,34 @@ def run(task: str):
             logger.error(f"Task directory not found: {task_dir}")
             raise TaskNotFoundError(task)
 
+        # Apply CLI overrides to environment
+        if llm_provider:
+            os.environ['LLM_PROVIDER'] = llm_provider
+        if llm_model:
+            os.environ['OLLAMA_MODEL'] = llm_model
+            os.environ['GIGACHAT_MODEL'] = llm_model
+        if debug_level is not None:
+            if debug_level == 0:
+                os.environ['LOG_LEVEL'] = 'CRITICAL'
+            elif debug_level == 1:
+                os.environ['LOG_LEVEL'] = 'ERROR'
+            elif debug_level == 2:
+                os.environ['LOG_LEVEL'] = 'INFO'
+            elif debug_level >= 3:
+                os.environ['LOG_LEVEL'] = 'DEBUG'
+
         # Pre-flight checks
         logger.info("Running pre-flight checks...")
 
-        # Check Ollama connectivity
-        ollama_check = InputValidator.check_ollama_connection(OLLAMA_BASE_URL)
-        if not ollama_check.is_valid:
-            logger.error("Ollama connectivity check failed")
-            for error in ollama_check.errors:
-                logger.error(f"  [{error.error_code}] {error.message}")
-            raise OllamaUnavailableError(OLLAMA_BASE_URL)
-
-        logger.info("✓ Ollama is accessible")
+        # Check Ollama connectivity (skip for GigaChat provider)
+        if not llm_provider or llm_provider.lower() != 'gigachat':
+            ollama_check = InputValidator.check_ollama_connection(OLLAMA_BASE_URL)
+            if not ollama_check.is_valid:
+                logger.error("Ollama connectivity check failed")
+                for error in ollama_check.errors:
+                    logger.error(f"  [{error.error_code}] {error.message}")
+                raise OllamaUnavailableError(OLLAMA_BASE_URL)
+            logger.info("✓ Ollama is accessible")
 
         # Run the audit task
         from tasks.base_task import AuditTask
