@@ -15,6 +15,10 @@ load_dotenv()
 
 PROJECT_ROOT = Path(__file__).parent.parent
 
+# Brink's Modern Internal Auditing configuration
+BRINKS_CHUNK_SIZE = 512  # Medium chunk for balance between detail & context
+BRINKS_CHAPTERS_INDEX = "knowledge/brinks_chapters.json"
+
 
 @dataclass
 class OllamaConfig:

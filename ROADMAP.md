@@ -3,7 +3,7 @@
 > Current sprint tracked in [.omc/notepad.md](.omc/notepad.md) (auto-loaded each session).
 
 ## Current Focus
-**M_Robert — uncle_Robert Primary Auditor** — planned (next after M1)
+**M_Evidence — Evidence Traceability & Requirements Hierarchy** OR **M_Robert — uncle_Robert Primary Auditor** — both planned (parallel, next after M1)
 
 ## Milestones
 
@@ -30,18 +30,36 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `main.py` — команда `build-persona` + 5 tests (Task 7 DONE)
 - [x] `tests/knowledge/test_persona_filter.py` — 40 tests total (19+9+6+5) ✅ M1 COMPLETE
 
-### M_Robert — uncle_Robert Primary Auditor 🔴
+### M_Robert — uncle_Robert Primary Auditor 🟢 IN PROGRESS
 
 **Why M_Robert?** Альтернативный ведущий аудитор на основе IIA Professional Practices Framework и Brink's Modern Internal Auditing methodology. Активируется через `--auditor uncle_robert` флаг в CLI. Использует CCCE format (Condition/Criteria/Cause/Effect) для наблюдений и Draft→Final two-stage pipeline.
 
+**Plan:** [.claude/plans/uncle-robert-auditor.md](.claude/plans/uncle-robert-auditor.md)
+
 **Tasks:**
-- [ ] `personas/uncle_robert/config.yaml` + `persona_prompt.md` — scaffolding + configuration
-- [ ] `python main.py build-persona uncle_robert` — ingest PDF corpus в ChromaDB
-- [ ] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG retrieval
-- [ ] `report_generator/orchestrator.py` — CCCE findings format + auditor dispatcher
-- [ ] `report_generator/orchestrator.py` — Draft→Final two-stage pipeline
-- [ ] `main.py` — `--auditor` флаг в `run` команде
-- [ ] `tests/agents/test_uncle_robert.py` — 14 unit tests (signature, RAG, CCCE format, pipeline)
+- [x] `personas/uncle_robert/config.yaml` + `persona_prompt.md` + `persona_context.md` — scaffolding + configuration (Task 1)
+- [ ] `python main.py build-persona uncle_robert` — ingest PDF corpus в ChromaDB (Task 2)
+- [x] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG retrieval (Task 3)
+- [x] `report_generator/ccce_formatter.py` (NEW) — CCCE findings format (Task 4)
+- [x] `report_generator/orchestrator.py` — auditor dispatcher (Task 5)
+- [x] `main.py` — `--auditor` флаг в `run` команде (Task 6)
+- [x] `tests/agents/test_uncle_robert.py` — 14 unit tests (Task 7)
+- [x] `core/config.py` — BRINKS_CHUNK_SIZE constants
+- [x] `knowledge/brinks_chapters.json` — chapter metadata with RAG flags
+
+### M_Evidence — Evidence Traceability & Requirements Hierarchy 🔴
+
+**Why M_Evidence?** Отчёты не содержат ссылок на анализируемые документы. RAG-запросы захардкожены, `evidence/` никогда не индексируется. Каждое наблюдение должно ссылаться на источник (Evidence) и применимые требования (L1 Регулятор / L2 Аудит / L3 Локальный). Система 3-уровневых требований: глобальная ChromaDB с metadata-фильтром (как persona-система, но по `req_level` и `task_name`).
+
+**Tasks:**
+- [ ] Task 1: `knowledge/indexer.py` — metadata schema (doc_type, req_level, page_number, task_name)
+- [ ] Task 2: `knowledge/requirements_indexer.py` (NEW) — L1/L2/L3 requirement library management
+- [ ] Task 3: `knowledge/evidence_indexer.py` (NEW) — SHA-256 incremental indexing per task
+- [ ] Task 4: `main.py create` — copy/download sources → evidence/ (local files, URLs, text queries)
+- [ ] Task 5: `main.py add-requirement` (NEW) — CLI для управления L1/L2/L3
+- [ ] Task 6: `tasks/base_task.py execute()` — sync evidence before report generation
+- [ ] Task 7: `report_generator/orchestrator.py` — source-aware prompts + citation enforcement
+- [ ] Task 8: tests — 24 тестов (evidence collection, requirements indexer, citations)
 
 ### M2 — Reviewer Agent (UncleKahneman) 🔴
 - [ ] `core/llm.py` — `LLMFactory.get_llm(mode="default"|"cheap"|"deep")`

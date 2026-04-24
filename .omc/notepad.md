@@ -11,17 +11,20 @@
 <!-- User content. Never auto-pruned. -->
 
 ### Current Focus
-**M_Robert — uncle_Robert Primary Auditor** (0/7 planned)
-- [ ] `personas/uncle_robert/config.yaml` + `persona_prompt.md` — scaffolding + config
-- [ ] `build-persona uncle_robert --corpus` — ingest PDF в ChromaDB
-- [ ] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG
-- [ ] `report_generator/orchestrator.py` — CCCE findings + auditor dispatcher
-- [ ] `report_generator/orchestrator.py` — Draft→Final pipeline
-- [ ] `main.py` — `--auditor` флаг в `run`
-- [ ] `tests/agents/test_uncle_robert.py` — 14 unit тестов
+**M_Robert — uncle_Robert Primary Auditor** (7/9 tasks complete)
+- [x] `personas/uncle_robert/config.yaml` + `persona_prompt.md` + `persona_context.md` — scaffolding + config
+- [x] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG
+- [x] `report_generator/ccce_formatter.py` (NEW) — CCCE findings formatter
+- [x] `report_generator/orchestrator.py` — auditor dispatcher + Task 5 integration
+- [x] `main.py` — `--auditor` флаг в `run` команде
+- [x] `tests/agents/test_uncle_robert.py` — 14 unit тестов
+- [x] `core/config.py` — BRINKS_CHUNK_SIZE + BRINKS_CHAPTERS_INDEX constants
+- [x] `knowledge/brinks_chapters.json` — chapter metadata (33 chapters, include_in_rag flags)
+- [ ] Task 2: `build-persona uncle_robert --corpus` — ingest PDF в ChromaDB (pending: indexing logic)
 
-**Status:** Planned. Plan saved → [.claude/plans/playful-yawning-gray.md](.claude/plans/playful-yawning-gray.md)
-**Blocker resolved:** M1 ✅ COMPLETE (8/8). Infrastructure ready for alternate auditors.
+**Status:** IN PROGRESS (core structure 100% complete, PDF indexing pending). 
+**Plan:** [.claude/plans/uncle-robert-auditor.md](.claude/plans/uncle-robert-auditor.md)
+**Architecture:** IIA Standards (Chapter 8) + Brink's 7th Edition (chapters 3-34), CCCE findings format, Draft→Final two-stage pipeline. CLI flag: `python main.py run --task <name> --auditor uncle_robert`
 
 Full backlog → [ROADMAP.md](../ROADMAP.md)
 

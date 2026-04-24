@@ -47,10 +47,12 @@ def create(name: str, company: str, sources: tuple, audit_type: str):
 
 @cli.command()
 @click.option('--task', required=True, help='Название задачи')
+@click.option('--auditor', default='cisa', type=click.Choice(['cisa', 'uncle_robert']),
+              help='Тип аудитора (default: cisa)')
 @click.option('--llm-provider', default=None, help='LLM провайдер (ollama, gigachat, anthropic, openai)')
 @click.option('--llm-model', default=None, help='Модель LLM')
 @click.option('--debug-level', type=int, default=None, help='Уровень отладки (0-3)')
-def run(task: str, llm_provider: str, llm_model: str, debug_level: int):
+def run(task: str, auditor: str, llm_provider: str, llm_model: str, debug_level: int):
     """Run an audit task with validation and error handling."""
     try:
         import os
@@ -90,6 +92,17 @@ def run(task: str, llm_provider: str, llm_model: str, debug_level: int):
                     logger.error(f"  [{error.error_code}] {error.message}")
                 raise OllamaUnavailableError(OLLAMA_BASE_URL)
             logger.info("✓ Ollama is accessible")
+
+        # Set auditor in task config
+        import yaml
+        config_path = task_dir / "config.yaml"
+        if config_path.exists():
+            config = yaml.safe_load(config_path.read_text(encoding='utf-8')) or {}
+        else:
+            config = {}
+        config['auditor'] = auditor
+        config_path.write_text(yaml.dump(config), encoding='utf-8')
+        logger.info(f"Using auditor: {auditor}")
 
         # Run the audit task
         from tasks.base_task import AuditTask

@@ -1,19 +1,23 @@
 from pathlib import Path
 from agents.cisa_auditor import CisaAuditor
+from agents.uncle_robert import UncleRobertAgent
 from knowledge.retriever import Retriever
 from core.logger import setup_logger
+from core.llm import get_llm
 import json
 from datetime import datetime
 
 class ReportOrchestrator:
     def __init__(self, task_dir: Path):
         self.task_dir = task_dir
-        self.auditor = CisaAuditor()
         self.retriever = Retriever()
         self.logger = setup_logger("orchestrator")
         self.drafts_dir = task_dir / "drafts"
         self.drafts_dir.mkdir(exist_ok=True)
         self.config = self._load_config()
+
+        # Initialize appropriate auditor based on config
+        self.auditor = self._init_auditor()
     
     def _load_config(self) -> dict:
         import yaml
@@ -21,6 +25,23 @@ class ReportOrchestrator:
         if config_path.exists():
             return yaml.safe_load(config_path.read_text(encoding='utf-8'))
         return {}
+
+    def _init_auditor(self):
+        """Initialize appropriate auditor based on config."""
+        auditor_type = self.config.get("auditor", "cisa")
+
+        if auditor_type == "uncle_robert":
+            self.logger.info("Initializing UncleRobertAgent auditor")
+            llm = get_llm(temperature=0.3)
+            return UncleRobertAgent(llm, self.config)
+
+        elif auditor_type == "cisa":
+            self.logger.info("Initializing CisaAuditor")
+            return CisaAuditor()
+
+        else:
+            self.logger.warning(f"Unknown auditor: {auditor_type}. Falling back to CISA.")
+            return CisaAuditor()
     
     def _get_context(self, query: str, exclude_personas: list = None) -> str:
         """Получить релевантный контекст из RAG.

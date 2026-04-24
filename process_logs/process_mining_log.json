@@ -1,42 +1,42 @@
 {
   "metadata": {
-    "created_at": "2026-04-23T13:27:10.916654",
+    "created_at": "2026-04-24T15:10:21.613831",
     "total_events": 4,
     "log_version": "1.0",
     "format": "process_mining_json"
   },
   "events": [
     {
-      "event_id": "460b8119-99be-4e04-959c-fce6fac9fc8a",
-      "timestamp": "2026-04-23T13:26:01.556124",
-      "date": "2026-04-23",
-      "time": "13:26:01",
+      "event_id": "8ddfd9e4-157f-4824-98a0-1a040eb62a05",
+      "timestamp": "2026-04-24T15:09:22.903846",
+      "date": "2026-04-24",
+      "time": "15:09:22",
       "process_name": "Audit_gogol_audit",
       "stage": "START",
-      "start_time": "2026-04-23T13:26:01.556093",
-      "end_time": "2026-04-23T13:26:01.556126",
-      "duration_seconds": 3.3e-05,
-      "duration_formatted": "0:00:00.000033",
+      "start_time": "2026-04-24T15:09:22.903815",
+      "end_time": "2026-04-24T15:09:22.903847",
+      "duration_seconds": 3.2e-05,
+      "duration_formatted": "0:00:00.000032",
       "author": "AI_Agent_Lisa",
       "character": "DigitalAuditor",
       "additional_data": {
         "task_name": "gogol_audit",
-        "company": "Имение Павла Ивановича Чичикова",
-        "audit_type": "security",
+        "company": "DigitalAuditor",
+        "audit_type": "it",
         "status": "started"
       }
     },
     {
-      "event_id": "0ae267de-92b0-4a3f-9128-a3a6d73b24aa",
-      "timestamp": "2026-04-23T13:26:01.556898",
-      "date": "2026-04-23",
-      "time": "13:26:01",
+      "event_id": "45eb947d-a39b-46d7-ba02-8564a0b6c66b",
+      "timestamp": "2026-04-24T15:09:22.904203",
+      "date": "2026-04-24",
+      "time": "15:09:22",
       "process_name": "Audit_gogol_audit",
       "stage": "Configuration_Validation",
-      "start_time": "2026-04-23T13:26:01.556093",
-      "end_time": "2026-04-23T13:26:01.556866",
-      "duration_seconds": 0.000773,
-      "duration_formatted": "0:00:00.000773",
+      "start_time": "2026-04-24T15:09:22.903815",
+      "end_time": "2026-04-24T15:09:22.904184",
+      "duration_seconds": 0.000369,
+      "duration_formatted": "0:00:00.000369",
       "author": "AI_Agent_Lisa",
       "character": "DigitalAuditor",
       "additional_data": {
@@ -46,16 +46,16 @@
       }
     },
     {
-      "event_id": "c1f3d60d-528d-4e40-a353-09ef2111035c",
-      "timestamp": "2026-04-23T13:27:10.915401",
-      "date": "2026-04-23",
-      "time": "13:27:10",
+      "event_id": "4a6c77a6-157f-47ca-8ca0-a73946a38f3f",
+      "timestamp": "2026-04-24T15:10:21.612583",
+      "date": "2026-04-24",
+      "time": "15:10:21",
       "process_name": "Audit_gogol_audit",
       "stage": "Report_Generation",
-      "start_time": "2026-04-23T13:26:01.556902",
-      "end_time": "2026-04-23T13:27:10.915372",
-      "duration_seconds": 69.35847,
-      "duration_formatted": "0:01:09.358470",
+      "start_time": "2026-04-24T15:09:22.904207",
+      "end_time": "2026-04-24T15:10:21.612552",
+      "duration_seconds": 58.708345,
+      "duration_formatted": "0:00:58.708345",
       "author": "AI_Agent_Lisa",
       "character": "DigitalAuditor",
       "additional_data": {
@@ -64,22 +64,22 @@
       }
     },
     {
-      "event_id": "cc68f262-ae99-41b5-a45d-078e8556e0de",
-      "timestamp": "2026-04-23T13:27:10.915517",
-      "date": "2026-04-23",
-      "time": "13:27:10",
+      "event_id": "6835122c-1a0f-4924-81a5-7ecfe2e1a64e",
+      "timestamp": "2026-04-24T15:10:21.612738",
+      "date": "2026-04-24",
+      "time": "15:10:21",
       "process_name": "Audit_gogol_audit",
       "stage": "END",
-      "start_time": "2026-04-23T13:26:01.556093",
-      "end_time": "2026-04-23T13:27:10.915503",
-      "duration_seconds": 69.35941,
-      "duration_formatted": "0:01:09.359410",
+      "start_time": "2026-04-24T15:09:22.903815",
+      "end_time": "2026-04-24T15:10:21.612717",
+      "duration_seconds": 58.708902,
+      "duration_formatted": "0:00:58.708902",
       "author": "AI_Agent_Lisa",
       "character": "DigitalAuditor",
       "additional_data": {
         "status": "success",
         "task_name": "gogol_audit",
-        "company": "Имение Павла Ивановича Чичикова"
+        "company": "DigitalAuditor"
       }
     }
   ]
