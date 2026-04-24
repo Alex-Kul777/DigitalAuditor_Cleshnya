@@ -576,3 +576,97 @@ class TestOrchestratorTask6:
 
                         assert len(context) == 500
                         assert context == "x" * 500
+
+
+class TestMainCLITask7:
+    """Test Task 7: main.py — build-persona CLI command."""
+
+    def test_build_persona_command_exists(self):
+        """Verify build-persona command is registered in CLI."""
+        from main import cli
+
+        assert 'build-persona' in [cmd.name for cmd in cli.commands.values()]
+
+    def test_build_persona_command_signature(self):
+        """Verify build-persona accepts name argument."""
+        from main import cli
+        import inspect
+
+        build_persona_cmd = None
+        for cmd in cli.commands.values():
+            if cmd.name == 'build-persona':
+                build_persona_cmd = cmd
+                break
+
+        assert build_persona_cmd is not None
+        # Check that it has required arguments
+        params = {p.name: p for p in build_persona_cmd.params}
+        assert 'name' in params
+        assert 'corpus' in params
+
+    def test_build_persona_scaffolds_directory(self):
+        """Verify build-persona creates persona directory structure."""
+        from click.testing import CliRunner
+        from main import cli
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch('knowledge.persona_indexer.PROJECT_ROOT', Path(tmpdir)):
+                runner = CliRunner()
+                result = runner.invoke(cli, ['build-persona', 'test_persona'])
+
+                # Command should succeed
+                assert result.exit_code == 0
+                assert "Persona 'test_persona' scaffolded" in result.output
+
+    def test_build_persona_with_corpus(self):
+        """Verify build-persona can ingest corpus."""
+        from click.testing import CliRunner
+        from main import cli
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create test corpus
+            corpus_dir = Path(tmpdir) / "corpus"
+            corpus_dir.mkdir()
+            (corpus_dir / "test.txt").write_text("Test document")
+
+            with patch('knowledge.persona_indexer.PROJECT_ROOT', Path(tmpdir)):
+                with patch('knowledge.persona_indexer.VectorIndexer') as mock_indexer_class:
+                    mock_indexer = Mock()
+                    mock_indexer.index_documents = Mock(return_value=1)
+                    mock_indexer_class.return_value = mock_indexer
+
+                    runner = CliRunner()
+                    result = runner.invoke(cli, [
+                        'build-persona', 'test_persona',
+                        '--corpus', str(corpus_dir)
+                    ])
+
+                    assert result.exit_code == 0
+                    assert "Indexed" in result.output
+
+    def test_build_persona_handles_missing_corpus(self):
+        """Verify build-persona handles missing corpus path."""
+        from click.testing import CliRunner
+        from main import cli
+
+        runner = CliRunner()
+        result = runner.invoke(cli, [
+            'build-persona', 'test_persona',
+            '--corpus', '/nonexistent/corpus'
+        ])
+
+        assert result.exit_code != 0
+        assert "not found" in result.output.lower()
+
+    def test_build_persona_lists_all_personas(self):
+        """Verify build-persona lists available personas after creation."""
+        from click.testing import CliRunner
+        from main import cli
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch('knowledge.persona_indexer.PROJECT_ROOT', Path(tmpdir)):
+                runner = CliRunner()
+                result = runner.invoke(cli, ['build-persona', 'new_persona'])
+
+                assert result.exit_code == 0
+                assert "Available personas:" in result.output

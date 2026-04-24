@@ -137,5 +137,50 @@ def audit_ms():
     import sys
     subprocess.run([sys.executable, "run_ms_audit.py"])
 
+@cli.command(name='build-persona')
+@click.argument('name')
+@click.option('--corpus', help='Path to corpus directory to ingest')
+def build_persona(name: str, corpus: str = None):
+    """Create and scaffold a new persona.
+
+    Args:
+        name: Persona name (e.g., uncle_kahneman)
+        --corpus: Optional path to document corpus to ingest
+    """
+    try:
+        from knowledge.persona_indexer import PersonaIndexer
+
+        persona_indexer = PersonaIndexer()
+
+        # Scaffold persona directory structure
+        logger.info(f"Scaffolding persona: {name}")
+        persona_dir = persona_indexer.scaffold(name)
+        click.echo(f"[+] Persona '{name}' scaffolded at: {persona_dir}")
+
+        # Ingest corpus if provided
+        if corpus:
+            corpus_path = Path(corpus)
+            if not corpus_path.exists():
+                raise FileNotFoundError(f"Corpus path not found: {corpus_path}")
+
+            logger.info(f"Ingesting corpus from {corpus_path} for persona '{name}'")
+            chunk_count = persona_indexer.ingest_corpus(name, str(corpus_path))
+            click.echo(f"[+] Indexed {chunk_count} chunks for persona '{name}'")
+
+        # List available personas
+        personas = persona_indexer.list_personas()
+        click.echo(f"[+] Available personas: {', '.join(personas)}")
+
+        logger.info(f"Persona '{name}' built successfully")
+
+    except FileNotFoundError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except Exception as e:
+        click.echo(f"[-] Error building persona: {str(e)}", err=True)
+        logger.error(f"Error building persona '{name}': {str(e)}", exc_info=True)
+        raise SystemExit(1)
+
 if __name__ == "__main__":
     cli()
