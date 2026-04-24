@@ -1,4 +1,5 @@
 import os
+import requests
 from core.logger import setup_logger
 
 logger = setup_logger("llm")
@@ -96,8 +97,19 @@ class LLMFactory:
     @classmethod
     def _get_ollama(cls, temperature: float):
         from langchain_ollama import OllamaLLM
+
+        base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+
+        try:
+            response = requests.get(f"{base_url}/api/tags", timeout=2)
+            if response.status_code != 200:
+                logger.warning(f"Ollama server not responding correctly: {response.status_code}")
+        except Exception as e:
+            logger.error(f"Ollama server is not running at {base_url}. Start it with: ollama serve")
+            raise ConnectionError(f"Ollama unavailable: {e}")
+
         return OllamaLLM(
-            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+            base_url=base_url,
             model=os.getenv("OLLAMA_MODEL", "digital-auditor-cisa"),
             temperature=temperature,
             num_ctx=8192

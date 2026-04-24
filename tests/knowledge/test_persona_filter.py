@@ -347,3 +347,85 @@ class TestPersonaInfrastructureIntegration:
                     )
                     indexer.index_documents([test_doc], persona="uncle_kahneman")
                     assert test_doc.metadata.get("persona") == "uncle_kahneman"
+
+
+class TestPersonaScaffoldingTask5:
+    """Test Task 5: personas/_templates/ and personas/uncle_kahneman/ structure."""
+
+    def test_templates_directory_exists(self):
+        """Verify personas/_templates/ directory exists."""
+        from core.config import PROJECT_ROOT
+        templates_dir = PROJECT_ROOT / "personas" / "_templates"
+        assert templates_dir.exists(), f"Templates dir missing: {templates_dir}"
+        assert templates_dir.is_dir()
+
+    def test_templates_config_exists(self):
+        """Verify personas/_templates/config.yaml exists and is valid."""
+        from core.config import PROJECT_ROOT
+        config_file = PROJECT_ROOT / "personas" / "_templates" / "config.yaml"
+        assert config_file.exists(), f"Template config missing: {config_file}"
+        content = config_file.read_text()
+        assert "name:" in content
+        assert "description:" in content
+        assert "corpus_dir:" in content
+
+    def test_templates_prompt_exists(self):
+        """Verify personas/_templates/persona_prompt.md exists."""
+        from core.config import PROJECT_ROOT
+        prompt_file = PROJECT_ROOT / "personas" / "_templates" / "persona_prompt.md"
+        assert prompt_file.exists(), f"Template prompt missing: {prompt_file}"
+        content = prompt_file.read_text()
+        assert "Role" in content
+        assert "Expertise" in content
+
+    def test_templates_corpus_directory(self):
+        """Verify personas/_templates/corpus/ directory exists."""
+        from core.config import PROJECT_ROOT
+        corpus_dir = PROJECT_ROOT / "personas" / "_templates" / "corpus"
+        assert corpus_dir.exists(), f"Template corpus dir missing: {corpus_dir}"
+        assert corpus_dir.is_dir()
+
+    def test_uncle_kahneman_directory_exists(self):
+        """Verify personas/uncle_kahneman/ directory exists."""
+        from core.config import PROJECT_ROOT
+        persona_dir = PROJECT_ROOT / "personas" / "uncle_kahneman"
+        assert persona_dir.exists(), f"Uncle Kahneman dir missing: {persona_dir}"
+        assert persona_dir.is_dir()
+
+    def test_uncle_kahneman_config_exists(self):
+        """Verify personas/uncle_kahneman/config.yaml exists and is valid."""
+        from core.config import PROJECT_ROOT
+        config_file = PROJECT_ROOT / "personas" / "uncle_kahneman" / "config.yaml"
+        assert config_file.exists(), f"Uncle Kahneman config missing: {config_file}"
+        content = config_file.read_text()
+        assert "uncle_kahneman" in content
+        assert "behavioral_economics" in content or "decision_making" in content
+
+    def test_uncle_kahneman_prompt_exists(self):
+        """Verify personas/uncle_kahneman/persona_prompt.md exists and has content."""
+        from core.config import PROJECT_ROOT
+        prompt_file = PROJECT_ROOT / "personas" / "uncle_kahneman" / "persona_prompt.md"
+        assert prompt_file.exists(), f"Uncle Kahneman prompt missing: {prompt_file}"
+        content = prompt_file.read_text()
+        assert "Kahneman" in content or "behavioral" in content.lower()
+        assert "System 1" in content or "System 2" in content
+        assert "Роль" in content or "Role" in content
+
+    def test_uncle_kahneman_corpus_directory(self):
+        """Verify personas/uncle_kahneman/corpus/ directory exists."""
+        from core.config import PROJECT_ROOT
+        corpus_dir = PROJECT_ROOT / "personas" / "uncle_kahneman" / "corpus"
+        assert corpus_dir.exists(), f"Uncle Kahneman corpus dir missing: {corpus_dir}"
+        assert corpus_dir.is_dir()
+
+    def test_persona_indexer_lists_uncle_kahneman(self):
+        """Verify PersonaIndexer.list_personas() finds uncle_kahneman."""
+        with patch('knowledge.persona_indexer.PROJECT_ROOT') as mock_root:
+            from core.config import PROJECT_ROOT
+            mock_root.__truediv__ = lambda self, x: PROJECT_ROOT / x
+            mock_root.__str__ = lambda self: str(PROJECT_ROOT)
+
+            indexer = PersonaIndexer()
+            personas = indexer.list_personas()
+
+            assert "uncle_kahneman" in personas, f"uncle_kahneman not found in {personas}"

@@ -48,34 +48,38 @@ class GigaChatClient:
 
         for attempt in range(self.max_retries):
             try:
-                from langchain_gigachat import GigaChat
+                from gigachat import GigaChat as GigaChatSDK
+                from gigachat.models import Chat, Messages, MessagesRole
 
-                llm = GigaChat(
+                client = GigaChatSDK(
                     credentials=self.api_key,
                     scope=self.scope,
                     model=self.model,
-                    timeout=self.timeout,
-                    max_tokens=int(os.getenv("GIGACHAT_MAX_TOKENS", "2000")),
-                    temperature=0.3,
-                    verbose=False,
-                    verify_ssl_certs=False
+                    verify_ssl_certs=False,
+                    timeout=self.timeout
                 )
 
+                messages = [
+                    Messages(role=MessagesRole.SYSTEM, content="Ты — старший ИТ-аудитор с сертификатами CISA и CIA."),
+                    Messages(role=MessagesRole.USER, content=prompt)
+                ]
+
                 self.token_counter.add_prompt(prompt)
-                response = llm.invoke(prompt)
-                self.token_counter.add_completion(response)
+                response = client.chat(Chat(messages=messages))
+                response_text = response.choices[0].message.content
+
+                self.token_counter.add_completion(response_text)
                 self._record_success()
 
-                return response
+                return response_text
 
             except ImportError:
-                logger.warning("langchain_gigachat not installed")
+                logger.warning("gigachat SDK not installed. Run: pip install gigachat")
                 return None
             except Exception as e:
                 logger.warning(f"GigaChat attempt {attempt + 1} failed: {e}")
                 if attempt < self.max_retries - 1:
-                    wait_time = 2 ** attempt
-                    time.sleep(wait_time)
+                    time.sleep(2 ** attempt)
                 else:
                     self._record_failure()
 

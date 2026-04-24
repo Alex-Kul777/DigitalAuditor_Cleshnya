@@ -25,10 +25,10 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `knowledge/indexer.py` — `index_documents(docs: list[Document])`
 - [x] `knowledge/persona_indexer.py` (NEW) — CLI фасад, `scaffold()`, `ingest_corpus()`
 - [x] `knowledge/persona_registry.py` (NEW) — `list_personas()`
-- [ ] `personas/_templates/` + `personas/uncle_kahneman/` — scaffolding
+- [x] `personas/_templates/` + `personas/uncle_kahneman/` — scaffolding + 9 tests (Task 5 DONE)
 - [ ] `report_generator/orchestrator.py:28` — `exclude_personas` в `_get_context`
 - [ ] `main.py` — команда `build-persona`
-- [x] `tests/knowledge/test_persona_filter.py`
+- [x] `tests/knowledge/test_persona_filter.py` — 28 tests total (19+9)
 
 ### M2 — Reviewer Agent (UncleKahneman) 🔴
 - [ ] `core/llm.py` — `LLMFactory.get_llm(mode="default"|"cheap"|"deep")`

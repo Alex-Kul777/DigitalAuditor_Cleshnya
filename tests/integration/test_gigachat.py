@@ -83,8 +83,13 @@ class TestGigaChatWrapper:
 class TestLLMFactory:
     """Tests for LLM Factory provider selection."""
 
-    def test_llm_factory_ollama_provider(self, monkeypatch):
+    @patch('core.llm.requests.get')
+    def test_llm_factory_ollama_provider(self, mock_get, monkeypatch):
         """Test LLM Factory returns OllamaLLM."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
         monkeypatch.setenv("LLM_PROVIDER", "ollama")
         llm = LLMFactory.get_llm(temperature=0.3)
         assert llm.__class__.__name__ == "OllamaLLM"
@@ -97,15 +102,25 @@ class TestLLMFactory:
         assert llm.__class__.__name__ == "GigaChatLLMAdapter"
         assert llm.temperature == 0.3
 
-    def test_llm_factory_hybrid_mode_fallback(self, monkeypatch):
+    @patch('core.llm.requests.get')
+    def test_llm_factory_hybrid_mode_fallback(self, mock_get, monkeypatch):
         """Test hybrid mode falls back to Ollama when GigaChat unavailable."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
         monkeypatch.setenv("LLM_PROVIDER", "hybrid")
         monkeypatch.delenv("GIGACHAT_API_KEY", raising=False)
         llm = LLMFactory.get_llm(temperature=0.3)
         assert llm.__class__.__name__ == "OllamaLLM"
 
-    def test_get_llm_function(self, monkeypatch):
+    @patch('core.llm.requests.get')
+    def test_get_llm_function(self, mock_get, monkeypatch):
         """Test backward-compatible get_llm() function."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
         monkeypatch.setenv("LLM_PROVIDER", "ollama")
         llm = get_llm(temperature=0.3)
         assert llm.__class__.__name__ == "OllamaLLM"

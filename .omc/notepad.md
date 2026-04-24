@@ -11,15 +11,15 @@
 <!-- User content. Never auto-pruned. -->
 
 ### Current Focus
-**M1 — Persona Infrastructure** (5/8 complete, blocker для M2-M5)
+**M1 — Persona Infrastructure** (6/8 complete, blocker для M2-M5)
 - [x] `knowledge/retriever.py` — `filter` + `exclude_personas` post-filter
 - [x] `knowledge/indexer.py` — `index_documents(docs: list[Document])`
 - [x] `knowledge/persona_indexer.py` (NEW) — CLI фасад, `scaffold()`, `ingest_corpus()`
 - [x] `knowledge/persona_registry.py` (NEW) — `list_personas()` (in PersonaIndexer)
-- [ ] `personas/_templates/` + `personas/uncle_kahneman/` — scaffolding
+- [x] `personas/_templates/` + `personas/uncle_kahneman/` — scaffolding (TASK 5 DONE)
 - [ ] `report_generator/orchestrator.py:28` — `exclude_personas` в `_get_context`
 - [ ] `main.py` — команда `build-persona`
-- [x] `tests/knowledge/test_persona_filter.py` — 19 unit tests (ALL PASSED)
+- [x] `tests/knowledge/test_persona_filter.py` — 28 unit tests (19+9 for Task 5, ALL PASSED)
 
 Full backlog → [ROADMAP.md](../ROADMAP.md)
 
