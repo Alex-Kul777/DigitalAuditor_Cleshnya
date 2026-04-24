@@ -30,3 +30,36 @@ class VectorIndexer:
             persist_directory=str(CHROMA_DB_PATH)
         )
         return len(chunks)
+
+    def index_documents(self, documents: list, persona: str = None) -> int:
+        """Index a list of Document objects with optional persona metadata.
+
+        Args:
+            documents: List of LangChain Document objects to index
+            persona: Optional persona identifier for metadata filtering
+
+        Returns:
+            Number of chunks indexed
+        """
+        self.logger.info(f"Indexing {len(documents)} documents" + (f" with persona='{persona}'" if persona else ""))
+
+        # Add persona metadata if specified
+        if persona:
+            for doc in documents:
+                if doc.metadata is None:
+                    doc.metadata = {}
+                doc.metadata["persona"] = persona
+
+        # Split documents into chunks
+        chunks = self.text_splitter.split_documents(documents)
+        self.logger.debug(f"Split into {len(chunks)} chunks")
+
+        # Get or create vector store and append documents
+        vector_store = Chroma(
+            persist_directory=str(CHROMA_DB_PATH),
+            embedding_function=self.embeddings
+        )
+        vector_store.add_documents(chunks)
+
+        self.logger.info(f"Indexed {len(chunks)} chunks" + (f" for persona='{persona}'" if persona else ""))
+        return len(chunks)

@@ -22,7 +22,7 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 
 **Tasks:**
 - [x] `knowledge/retriever.py` — `filter` + `exclude_personas` post-filter
-- [ ] `knowledge/indexer.py` — `index_documents(docs: list[Document])`
+- [x] `knowledge/indexer.py` — `index_documents(docs: list[Document])`
 - [ ] `knowledge/persona_indexer.py` (NEW) — CLI фасад, `scaffold()`, `ingest_corpus()`
 - [ ] `knowledge/persona_registry.py` (NEW) — `list_personas()`
 - [ ] `personas/_templates/` + `personas/uncle_kahneman/` — scaffolding

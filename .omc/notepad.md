@@ -13,7 +13,7 @@
 ### Current Focus
 **M1 — Persona Infrastructure** (blocker для M2-M5)
 - [x] `knowledge/retriever.py` — добавить `filter` + `exclude_personas`
-- [ ] `knowledge/indexer.py` — метод `index_documents(docs)`
+- [x] `knowledge/indexer.py` — метод `index_documents(docs)`
 - [ ] `knowledge/persona_indexer.py` (NEW) — CLI фасад
 - [ ] `personas/uncle_kahneman/` — scaffolding из templates
 - [ ] `main.py` — команда `build-persona`
