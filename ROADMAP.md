@@ -21,7 +21,7 @@ Solution: Metadata-based filtering. Index all documents together (efficient), bu
 Result: Multi-persona framework without mixing concerns. Scale from one auditor to N reviewers.
 
 **Tasks:**
-- [ ] `knowledge/retriever.py` — `filter` + `exclude_personas` post-filter
+- [x] `knowledge/retriever.py` — `filter` + `exclude_personas` post-filter
 - [ ] `knowledge/indexer.py` — `index_documents(docs: list[Document])`
 - [ ] `knowledge/persona_indexer.py` (NEW) — CLI фасад, `scaffold()`, `ingest_corpus()`
 - [ ] `knowledge/persona_registry.py` (NEW) — `list_personas()`
