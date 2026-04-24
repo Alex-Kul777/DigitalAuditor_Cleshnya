@@ -8,6 +8,19 @@
 ## Milestones
 
 ### M1 — Persona Infrastructure 🔴
+
+**Why M1?**
+
+Currently all knowledge lives in one ChromaDB: audit documents, evidence, etc. When we add reviewer-personas (e.g., Uncle Kahneman), their corpus also goes into ChromaDB. Problem: **CisaAuditor retrieves persona-knowledge by accident**, contaminating audit findings with reviewer's cognitive biases.
+
+Solution: Metadata-based filtering. Index all documents together (efficient), but:
+- CisaAuditor calls `retrieve(query, exclude_personas=["uncle_kahneman", ...])` → audit-docs only
+- UncleKahneman calls `retrieve(query, filter={"persona":"uncle_kahneman"})` → own corpus only
+- Audit trail stays clean; reviewer comments are separate document
+
+Result: Multi-persona framework without mixing concerns. Scale from one auditor to N reviewers.
+
+**Tasks:**
 - [ ] `knowledge/retriever.py` — `filter` + `exclude_personas` post-filter
 - [ ] `knowledge/indexer.py` — `index_documents(docs: list[Document])`
 - [ ] `knowledge/persona_indexer.py` (NEW) — CLI фасад, `scaffold()`, `ingest_corpus()`
