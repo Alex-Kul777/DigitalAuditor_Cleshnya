@@ -24,10 +24,12 @@ build/
 
 # Claude Code / Tools
 .omc/
+!.omc/notepad.md
 .claude/session-*
 .claude/transcripts/
 .claude/plans/
 .claude/memories/
+.claude/memory/
 .claude/worktrees/
 
 # Project specific
