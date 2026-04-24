@@ -3,7 +3,7 @@
 > Current sprint tracked in [.omc/notepad.md](.omc/notepad.md) (auto-loaded each session).
 
 ## Current Focus
-**M1 — Persona Infrastructure** — в работе
+**M_Robert — uncle_Robert Primary Auditor** — planned (next after M1)
 
 ## Milestones
 
@@ -29,6 +29,19 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `report_generator/orchestrator.py:28` — `exclude_personas` в `_get_context` + 6 tests (Task 6 DONE)
 - [x] `main.py` — команда `build-persona` + 5 tests (Task 7 DONE)
 - [x] `tests/knowledge/test_persona_filter.py` — 40 tests total (19+9+6+5) ✅ M1 COMPLETE
+
+### M_Robert — uncle_Robert Primary Auditor 🔴
+
+**Why M_Robert?** Альтернативный ведущий аудитор на основе IIA Professional Practices Framework и Brink's Modern Internal Auditing methodology. Активируется через `--auditor uncle_robert` флаг в CLI. Использует CCCE format (Condition/Criteria/Cause/Effect) для наблюдений и Draft→Final two-stage pipeline.
+
+**Tasks:**
+- [ ] `personas/uncle_robert/config.yaml` + `persona_prompt.md` — scaffolding + configuration
+- [ ] `python main.py build-persona uncle_robert` — ingest PDF corpus в ChromaDB
+- [ ] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG retrieval
+- [ ] `report_generator/orchestrator.py` — CCCE findings format + auditor dispatcher
+- [ ] `report_generator/orchestrator.py` — Draft→Final two-stage pipeline
+- [ ] `main.py` — `--auditor` флаг в `run` команде
+- [ ] `tests/agents/test_uncle_robert.py` — 14 unit tests (signature, RAG, CCCE format, pipeline)
 
 ### M2 — Reviewer Agent (UncleKahneman) 🔴
 - [ ] `core/llm.py` — `LLMFactory.get_llm(mode="default"|"cheap"|"deep")`

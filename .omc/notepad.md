@@ -11,17 +11,17 @@
 <!-- User content. Never auto-pruned. -->
 
 ### Current Focus
-**✅ M1 — Persona Infrastructure** (8/8 COMPLETE 🎉)
-- [x] `knowledge/retriever.py` — `filter` + `exclude_personas` post-filter
-- [x] `knowledge/indexer.py` — `index_documents(docs: list[Document])`
-- [x] `knowledge/persona_indexer.py` (NEW) — CLI фасад, `scaffold()`, `ingest_corpus()`
-- [x] `knowledge/persona_registry.py` (NEW) — `list_personas()` (in PersonaIndexer)
-- [x] `personas/_templates/` + `personas/uncle_kahneman/` — scaffolding (TASK 5 DONE)
-- [x] `report_generator/orchestrator.py:28` — `exclude_personas` в `_get_context` (TASK 6 DONE)
-- [x] `main.py` — команда `build-persona` (TASK 7 DONE)
-- [x] `tests/knowledge/test_persona_filter.py` — 40 unit tests (19+9+6+5, ALL PASSED)
+**M_Robert — uncle_Robert Primary Auditor** (0/7 planned)
+- [ ] `personas/uncle_robert/config.yaml` + `persona_prompt.md` — scaffolding + config
+- [ ] `build-persona uncle_robert --corpus` — ingest PDF в ChromaDB
+- [ ] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG
+- [ ] `report_generator/orchestrator.py` — CCCE findings + auditor dispatcher
+- [ ] `report_generator/orchestrator.py` — Draft→Final pipeline
+- [ ] `main.py` — `--auditor` флаг в `run`
+- [ ] `tests/agents/test_uncle_robert.py` — 14 unit тестов
 
-**Next:** M2 — Reviewer Agent (UncleKahneman) — blocker resolved!
+**Status:** Planned. Plan saved → [.claude/plans/playful-yawning-gray.md](.claude/plans/playful-yawning-gray.md)
+**Blocker resolved:** M1 ✅ COMPLETE (8/8). Infrastructure ready for alternate auditors.
 
 Full backlog → [ROADMAP.md](../ROADMAP.md)
 
