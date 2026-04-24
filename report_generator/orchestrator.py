@@ -22,10 +22,26 @@ class ReportOrchestrator:
             return yaml.safe_load(config_path.read_text(encoding='utf-8'))
         return {}
     
-    def _get_context(self, query: str) -> str:
-        """Получить релевантный контекст из RAG"""
+    def _get_context(self, query: str, exclude_personas: list = None) -> str:
+        """Получить релевантный контекст из RAG.
+
+        Args:
+            query: Search query
+            exclude_personas: List of persona names to exclude (e.g., ['uncle_kahneman']).
+                            If None, excludes all known personas by default (audit-only docs).
+
+        Returns:
+            Context string from retrieved documents or empty string on failure
+        """
         try:
-            docs = self.retriever.retrieve(query, k=3)
+            # If not specified, exclude all personas (pure audit context)
+            if exclude_personas is None:
+                from knowledge.persona_indexer import PersonaIndexer
+                persona_indexer = PersonaIndexer()
+                exclude_personas = persona_indexer.list_personas()
+                self.logger.debug(f"Excluding personas: {exclude_personas}")
+
+            docs = self.retriever.retrieve(query, k=3, exclude_personas=exclude_personas)
             if docs:
                 context = "\n\n".join([d["content"][:500] for d in docs])
                 return context

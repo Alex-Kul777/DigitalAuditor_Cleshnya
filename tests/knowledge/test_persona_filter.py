@@ -429,3 +429,150 @@ class TestPersonaScaffoldingTask5:
             personas = indexer.list_personas()
 
             assert "uncle_kahneman" in personas, f"uncle_kahneman not found in {personas}"
+
+
+class TestOrchestratorTask6:
+    """Test Task 6: report_generator/orchestrator.py — exclude_personas integration."""
+
+    def test_get_context_signature_has_exclude_personas(self):
+        """Verify _get_context() accepts exclude_personas parameter."""
+        from report_generator.orchestrator import ReportOrchestrator
+        import inspect
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            task_dir.mkdir(exist_ok=True)
+            (task_dir / "config.yaml").write_text("company: Test")
+
+            with patch('report_generator.orchestrator.CisaAuditor'):
+                with patch('report_generator.orchestrator.Retriever'):
+                    orchestrator = ReportOrchestrator(task_dir)
+                    sig = inspect.signature(orchestrator._get_context)
+                    assert 'exclude_personas' in sig.parameters
+
+    def test_get_context_excludes_all_personas_by_default(self):
+        """Verify _get_context() excludes all personas when not specified."""
+        from report_generator.orchestrator import ReportOrchestrator
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            task_dir.mkdir(exist_ok=True)
+            (task_dir / "config.yaml").write_text("company: Test")
+
+            with patch('report_generator.orchestrator.CisaAuditor'):
+                with patch('report_generator.orchestrator.Retriever') as mock_retriever_class:
+                    mock_retriever = Mock()
+                    mock_retriever.retrieve = Mock(return_value=[
+                        {"content": "Test document content"}
+                    ])
+                    mock_retriever_class.return_value = mock_retriever
+
+                    with patch('knowledge.persona_indexer.PROJECT_ROOT') as mock_root:
+                        from core.config import PROJECT_ROOT
+                        mock_root.__truediv__ = lambda self, x: PROJECT_ROOT / x
+                        mock_root.__str__ = lambda self: str(PROJECT_ROOT)
+
+                        orchestrator = ReportOrchestrator(task_dir)
+                        context = orchestrator._get_context("test query")
+
+                        # Verify retrieve was called with exclude_personas
+                        mock_retriever.retrieve.assert_called()
+                        call_kwargs = mock_retriever.retrieve.call_args[1]
+                        assert 'exclude_personas' in call_kwargs
+                        assert isinstance(call_kwargs['exclude_personas'], list)
+
+    def test_get_context_respects_explicit_exclude_personas(self):
+        """Verify _get_context() uses explicit exclude_personas when provided."""
+        from report_generator.orchestrator import ReportOrchestrator
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            task_dir.mkdir(exist_ok=True)
+            (task_dir / "config.yaml").write_text("company: Test")
+
+            with patch('report_generator.orchestrator.CisaAuditor'):
+                with patch('report_generator.orchestrator.Retriever') as mock_retriever_class:
+                    mock_retriever = Mock()
+                    mock_retriever.retrieve = Mock(return_value=[
+                        {"content": "Test document"}
+                    ])
+                    mock_retriever_class.return_value = mock_retriever
+
+                    orchestrator = ReportOrchestrator(task_dir)
+                    orchestrator._get_context("test", exclude_personas=["uncle_kahneman"])
+
+                    # Verify retrieve was called with explicit list
+                    call_kwargs = mock_retriever.retrieve.call_args[1]
+                    assert call_kwargs['exclude_personas'] == ["uncle_kahneman"]
+
+    def test_get_context_returns_concatenated_content(self):
+        """Verify _get_context() concatenates document content."""
+        from report_generator.orchestrator import ReportOrchestrator
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            task_dir.mkdir(exist_ok=True)
+            (task_dir / "config.yaml").write_text("company: Test")
+
+            with patch('report_generator.orchestrator.CisaAuditor'):
+                with patch('report_generator.orchestrator.Retriever') as mock_retriever_class:
+                    mock_retriever = Mock()
+                    mock_retriever.retrieve = Mock(return_value=[
+                        {"content": "Document 1 content"},
+                        {"content": "Document 2 content"}
+                    ])
+                    mock_retriever_class.return_value = mock_retriever
+
+                    with patch('knowledge.persona_indexer.PersonaIndexer'):
+                        orchestrator = ReportOrchestrator(task_dir)
+                        context = orchestrator._get_context("test")
+
+                        assert "Document 1 content" in context
+                        assert "Document 2 content" in context
+                        assert "\n\n" in context  # Documents separated by newlines
+
+    def test_get_context_handles_retrieval_failure(self):
+        """Verify _get_context() handles retriever exceptions gracefully."""
+        from report_generator.orchestrator import ReportOrchestrator
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            task_dir.mkdir(exist_ok=True)
+            (task_dir / "config.yaml").write_text("company: Test")
+
+            with patch('report_generator.orchestrator.CisaAuditor'):
+                with patch('report_generator.orchestrator.Retriever') as mock_retriever_class:
+                    mock_retriever = Mock()
+                    mock_retriever.retrieve = Mock(side_effect=Exception("Retriever error"))
+                    mock_retriever_class.return_value = mock_retriever
+
+                    orchestrator = ReportOrchestrator(task_dir)
+                    context = orchestrator._get_context("test")
+
+                    assert context == ""  # Returns empty string on error
+
+    def test_get_context_truncates_long_documents(self):
+        """Verify _get_context() truncates documents to 500 chars."""
+        from report_generator.orchestrator import ReportOrchestrator
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            task_dir.mkdir(exist_ok=True)
+            (task_dir / "config.yaml").write_text("company: Test")
+
+            long_content = "x" * 1000
+
+            with patch('report_generator.orchestrator.CisaAuditor'):
+                with patch('report_generator.orchestrator.Retriever') as mock_retriever_class:
+                    mock_retriever = Mock()
+                    mock_retriever.retrieve = Mock(return_value=[
+                        {"content": long_content}
+                    ])
+                    mock_retriever_class.return_value = mock_retriever
+
+                    with patch('knowledge.persona_indexer.PersonaIndexer'):
+                        orchestrator = ReportOrchestrator(task_dir)
+                        context = orchestrator._get_context("test")
+
+                        assert len(context) == 500
+                        assert context == "x" * 500
