@@ -82,6 +82,10 @@ ls tasks/instances/security_audit_2026/output/
 - Multilingual support (Russian, English, etc.)
 - Automatic document chunking and indexing
 
+## Roadmap
+
+Full milestone tracker and backlog: [ROADMAP.md](ROADMAP.md).
+
 ## Architecture
 
 ### Directory Structure

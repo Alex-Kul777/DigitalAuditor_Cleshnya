@@ -199,8 +199,10 @@ Run tests before committing changes. Tests should import from project root (not 
 
 ## Important Notes
 
+- **Backlog**: Tasks and milestones tracked in [`ROADMAP.md`](ROADMAP.md). Current sprint in [`.omc/notepad.md`](.omc/notepad.md) (auto-loaded each session).
 - **Ollama Requirement**: The system expects Ollama running locally with a custom model `digital-auditor-cisa`. Ensure Ollama is started before running audits.
 - **API Keys**: Tavily API key needed for web search features. Set in `.env` file.
 - **Language**: System prompts use Russian for audit output. Responses follow official-business Russian style.
 - **Vector Store**: ChromaDB is stateful. Index updates may require rebuild if documents change significantly.
 - **Task Isolation**: Each audit task is independent with its own directory. Outputs and evidence don't interfere.
+- **Session Context**: At the end of each working session, update `.claude/memory/project_context.md` with key decisions made, current task status, and open questions. The Stop hook writes timestamps automatically, but content requires manual updates.
