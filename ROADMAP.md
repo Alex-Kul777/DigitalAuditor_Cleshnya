@@ -83,10 +83,13 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `agents/revision_agent.py` (NEW) — LLM-guided revision loop
 - [x] `main.py` — команды `export-docx`, `revise` + `tests/integration/test_docx_cycle.py` (9 tests)
 
-### M5 — Personalization 🟢
-- [ ] `core/preferences.py` (NEW) — hybrid store global + per-task
-- [ ] `agents/preference_learner.py` (NEW) — Track Changes → term substitutions
-- [ ] `config/user_preferences.yaml.example`
+### M5 — Personalization 🟢 COMPLETE (6/6 tasks ✅)
+- [x] `core/preferences.py` (NEW) — PreferencesStore + UserPreferences dataclass (4 categories)
+- [x] `agents/preference_learner.py` (NEW) — Track Changes → term substitutions (MIN_FREQUENCY=2)
+- [x] `agents/revision_agent.py` integration — auto-learn after revise()
+- [x] `report_generator/orchestrator.py` integration — load + apply preferences in prompts
+- [x] `config/user_preferences.yaml.example` — example with all options
+- [x] `tests/test_preferences.py` — 19 unit tests
 
 ---
 
