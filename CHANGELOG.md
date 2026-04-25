@@ -5,26 +5,103 @@ All notable changes to DigitalAuditor Cleshnya will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2026-04-21
+## [Unreleased]
+
+### Added
+- (Auto-generated entries from merged PRs will appear here)
+
+### Changed
+- (Auto-generated entries from merged PRs will appear here)
 
 ### Fixed
+- (Auto-generated entries from merged PRs will appear here)
 
-- **Configuration Validation**: Fixed gogol_audit config - changed invalid audit_type 'forensic' to 'security'
-- **Test Mocking**: Fixed test_agents.py - corrected mock targets to use get_llm instead of non-existent OllamaLLM
-- **Test Mocking**: Fixed test_knowledge.py (25 tests) - corrected mocks for HuggingFaceEmbeddings and setup_logger
-- **Smoke Tests**: Fixed CisaAuditor class name reference (was CISAAuditor)
+---
+
+## [2.0.0] - 2026-04-25
+
+**Major release**: All 5 core milestones (M1-M5) complete + Process Mining logging. Production-ready with 54% coverage, 300+ tests.
 
 ### Added
 
-- **Configuration Tests**: New test_config_validation.py with 6 unit tests for audit_type validation
-- **Task Configuration**: Added missing config.yaml for ms_copilot_audit task
-- **Dependencies**: Added explicit langchain-chroma>=0.3.0 dependency
-- **Environment**: Added HF_TOKEN to .env.example for HuggingFace authentication
+#### M5 — Personalization (6 tasks ✅)
+- User preference learning system via Track Changes feedback (term substitutions, min frequency 2)
+- PreferencesStore + UserPreferences dataclass with 4 preference categories
+- Auto-learning in revision cycle (preference_learner.py)
+- Automatic preference application in report generation prompts
+- 19 unit tests for preference system
 
-### Improved
+#### M4 — DOCX Export & Revision Cycle (6 tasks ✅)
+- DOCX backend adapter layer supporting 3 libraries (PythonDocx, DocxEditor, DocxRevisions)
+- Markdown to DOCX export with Track Changes comments
+- DOCX import with feedback extraction and comment separation
+- Version management with manifest tracking (versions/ directory)
+- LLM-guided revision loop with revision_agent.py
+- 9 integration tests for full DOCX export/import/revise cycle
+- CLI commands: export-docx, revise, import-feedback
 
-- **Permissions**: Added permanent pytest permission to project settings (no prompt required)
-- **Test Coverage**: Unit tests now 48+ passing (agents, knowledge, config, CLI options)
+#### M_Evidence — Evidence Traceability & Requirements Hierarchy (8 tasks ✅)
+- Metadata-based document filtering (doc_type, req_level, page_number, task_name)
+- Requirements management: L1 (Regulatory), L2 (Audit Standard), L3 (Local) levels
+- Evidence indexing with SHA-256 incremental per-task tracking
+- Source awareness in audit findings with automatic citations
+- CLI commands: create (with source download), add-requirement
+- Evidence collection sync before report generation
+- 41 integration tests for evidence collection and requirements
+
+#### M_Robert — uncle_Robert Primary Auditor (8 tasks ✅)
+- Alternative primary auditor based on IIA Professional Practices Framework + Brink's Modern Internal Auditing
+- CCCE format (Condition/Criteria/Cause/Effect) for findings
+- Draft→Final two-stage audit pipeline
+- Brink's chapter-based RAG retrieval with 26 indexed chapters
+- Activatable via --auditor uncle_robert CLI flag
+- 27 unit tests (14 UncleRobertAgent + 13 BrinksIndexer)
+
+#### M3 — Reviewer Integration (4 tasks ✅)
+- Reviewer hook in report orchestrator (post-audit analysis)
+- CLI --reviewer flag for run/create commands
+- Soft validation warnings for unknown reviewers
+- 7 integration tests for reviewer hook
+
+#### M2 — Reviewer Agent: UncleKahneman (5 tasks ✅)
+- S1/S2 cognitive bias detection algorithm (System 1 fast / System 2 slow deliberate)
+- LLMFactory with mode support (cheap/deep) for cost-efficient multi-pass review
+- UncleKahneman persona leveraging Kahneman's cognitive psychology principles
+- 18 unit tests for two-pass review logic
+
+#### M1 — Persona Infrastructure (7 tasks ✅)
+- Metadata-based persona filtering in ChromaDB (exclude_personas, filter by persona)
+- Multi-persona framework without knowledge contamination
+- Persona scaffolding and corpus management
+- CLI facade: build-persona command with corpus ingestion
+- Persona registry for discovery and listing
+- Orchestrator integration with persona awareness
+- 40 unit tests for persona filtering
+
+#### Process Mining Logging System
+- ProcessMiningLogger for capturing system processes and audit actions
+- CSV, JSON, plain text export formats
+- Process logs directory (process_logs/)
+- 33 unit + integration tests
+
+### Changed
+
+- `report_generator/orchestrator.py` — Reviewer hook integration, persona filtering, evidence awareness
+- `core/llm.py` — LLMFactory with mode-based model selection (cheap/deep)
+- `knowledge/retriever.py` — Metadata-based filtering (persona, requirements level, task scope)
+- `core/config.py` — Brinks chapter constants and configuration expansion
+- `main.py` — New CLI commands: build-persona, add-requirement, export-docx, revise, import-feedback; --auditor and --reviewer flags
+
+### Fixed
+
+- Task isolation: Audit tasks no longer share vector store contamination
+- Evidence citation accuracy: All findings now link to source documents
+- Persona knowledge segregation: Reviewer corpora no longer bleed into audit findings
+- DOCX revision cycle: Proper Track Changes handling across import/export
+
+---
+
+## [1.1.0] - 2026-04-20 (Phase 3 Complete)
 
 ---
 
