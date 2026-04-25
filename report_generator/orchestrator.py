@@ -6,6 +6,8 @@ from core.logger import setup_logger
 from core.llm import get_llm
 import json
 import re
+import os
+import importlib
 from datetime import datetime
 
 class ReportOrchestrator:
@@ -265,10 +267,62 @@ class ReportOrchestrator:
         
         output_path = self.task_dir / "output" / "Audit_Report.md"
         output_path.write_text(final_content, encoding='utf-8')
-        
+
         self.logger.info(f"Report saved to {output_path}")
+
+        # Reviewer hook: optionally inject reviewer comments
+        self._apply_reviewer_hook(final_content)
+
         return output_path
     
+    def _apply_reviewer_hook(self, final_content: str) -> None:
+        """Apply reviewer comments to final report (optional, non-blocking).
+
+        Checks config for 'reviewer' field. If set, loads reviewer class
+        dynamically and calls review_markdown(). Saves reviewed report to
+        separate file (Audit_Report_Reviewed.md).
+
+        Args:
+            final_content: Assembled final report markdown
+
+        Note: Errors are logged but do NOT fail audit. Main Audit_Report.md
+              is always saved to preserve audit trail.
+        """
+        # Check for reviewer override from CLI
+        reviewer_name = os.getenv('DA_REVIEWER_OVERRIDE') or self.config.get('reviewer')
+
+        if not reviewer_name:
+            return  # No reviewer configured
+
+        # Mapping of reviewer names to module paths
+        REVIEWERS = {
+            "uncle_kahneman": "agents.uncle_kahneman.UncleKahneman"
+        }
+
+        if reviewer_name not in REVIEWERS:
+            self.logger.warning(f"Unknown reviewer '{reviewer_name}', skipping review")
+            return
+
+        try:
+            # Dynamically load reviewer class
+            module_path, class_name = REVIEWERS[reviewer_name].rsplit('.', 1)
+            module = importlib.import_module(module_path)
+            reviewer_class = getattr(module, class_name)
+
+            self.logger.info(f"Applying {reviewer_name} review to report...")
+            reviewer = reviewer_class(persona_name=reviewer_name)
+            reviewed_content = reviewer.review_markdown(final_content)
+
+            # Save reviewed report to separate file
+            reviewed_path = self.task_dir / "output" / "Audit_Report_Reviewed.md"
+            reviewed_path.write_text(reviewed_content, encoding='utf-8')
+
+            self.logger.info(f"Reviewed report saved: {reviewed_path}")
+
+        except Exception as e:
+            self.logger.error(f"Reviewer '{reviewer_name}' failed: {e}", exc_info=True)
+            # NOT re-raising — audit trail (Audit_Report.md) is already safe
+
     def _assemble_report(self, company: str) -> str:
         chapters = [
             f"# Отчет об ИТ-аудите\n\n**Компания:** {company}\n**Дата:** {datetime.now().strftime('%d.%m.%Y')}\n\n---\n\n",
