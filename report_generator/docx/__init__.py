@@ -6,6 +6,8 @@ from report_generator.docx.backends import (
     DocxEditorBackend,
     DocxRevisionsBackend,
     get_backend,
+    RevisionRecord,
+    CommentRecord,
 )
 from report_generator.docx.exporter import DocxExporter
 from report_generator.docx.importer import DocxImporter, Feedback
@@ -17,6 +19,8 @@ __all__ = [
     "DocxEditorBackend",
     "DocxRevisionsBackend",
     "get_backend",
+    "RevisionRecord",
+    "CommentRecord",
     "DocxExporter",
     "DocxImporter",
     "Feedback",

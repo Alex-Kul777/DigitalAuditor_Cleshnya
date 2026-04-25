@@ -82,6 +82,16 @@ class RevisionAgent(BaseAgent):
         vm.save(next_version, revised_md, revised_docx_path)
         logger.info(f"Saved version {next_version}")
 
+        # Auto-learn preferences from this revision
+        try:
+            from agents.preference_learner import PreferenceLearner
+            learner = PreferenceLearner()
+            learned = learner.learn_from_revision(task_dir)
+            if learned.terminology:
+                logger.info(f"Preferences learned: {len(learned.terminology)} term substitutions")
+        except Exception as e:
+            logger.warning(f"Preference learning failed: {e}")
+
         return revised_docx_path
 
     def _apply_feedback(self, source_md: str, user_comments, tracked_changes) -> str:

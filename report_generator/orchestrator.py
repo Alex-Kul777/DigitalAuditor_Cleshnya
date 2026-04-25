@@ -109,13 +109,32 @@ class ReportOrchestrator:
         sources = self.config.get('sources', [])
         sources_ctx = ", ".join(sources) if sources else company
 
+        # Load user preferences (terminology, tone, format)
+        from core.preferences import PreferencesStore
+        prefs = PreferencesStore().load(task_name=task_name)
+
         evidence_ctx = self._get_context(
             f"аудит {sources_ctx} нарушения проблемы риски",
             task_name=task_name
         )
         criteria_ctx = self._get_criteria_context(f"требования стандарты {sources_ctx}")
 
+        # Build terminology context
+        terminology_ctx = ""
+        if prefs.terminology:
+            pairs = "; ".join(f'"{k}" → "{v}"' for k, v in prefs.terminology.items())
+            terminology_ctx = f"\n\nПредпочтительная терминология: {pairs}"
+
+        # Build tone context
+        tone_map = {
+            "official": "официально-деловой стиль",
+            "business": "деловой стиль",
+            "technical": "технический стиль",
+        }
+        tone_ctx = tone_map.get(prefs.tone, "официально-деловой стиль")
+
         prompt = f"""Ты — опытный аудитор CISA. Анализируй материалы о {sources_ctx}.
+Используй {tone_ctx}."""
 
 КОНТЕКСТ ИЗ ИСТОЧНИКА (Evidence):
 {evidence_ctx or 'Контекст не найден — анализируй по общим принципам'}
@@ -123,7 +142,7 @@ class ReportOrchestrator:
 ПРИМЕНИМЫЕ ТРЕБОВАНИЯ (L1/L2/L3):
 {criteria_ctx or 'Требования не загружены — используй CISA/COBIT/ISO 27001'}
 
-Сгенерируй 3-5 наблюдений в формате:
+Сгенерируй {prefs.findings_count} наблюдений в формате:
 
 ### Наблюдение [номер]: [заголовок]
 
