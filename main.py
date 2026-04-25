@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import click
+import shutil
 from pathlib import Path
 from datetime import datetime
 import yaml
@@ -13,6 +14,7 @@ from core.exceptions import (
 )
 from core.config import OLLAMA_BASE_URL
 from core.logger import setup_logger
+from tools.file_downloader import download_file
 
 logger = setup_logger("main")
 
@@ -25,16 +27,44 @@ def cli():
 @cli.command()
 @click.option('--name', required=True, help='Название задачи')
 @click.option('--company', required=True, help='Название компании')
-@click.option('--sources', multiple=True, help='Источники')
+@click.option('--sources', multiple=True, help='Источники (файлы, URL, текстовые запросы)')
 @click.option('--audit-type', default='it', help='Тип аудита')
 def create(name: str, company: str, sources: tuple, audit_type: str):
+    """Create a new audit task with optional evidence sources."""
     task_dir = Path(f"tasks/instances/{name}")
     task_dir.mkdir(parents=True, exist_ok=True)
-    (task_dir / "evidence").mkdir(exist_ok=True)
+
+    evidence_dir = task_dir / "evidence"
+    evidence_dir.mkdir(exist_ok=True)
     (task_dir / "drafts").mkdir(exist_ok=True)
     (task_dir / "output").mkdir(exist_ok=True)
-    (task_dir / "evidence/.gitkeep").touch()
-    
+
+    # Process sources: copy files, download URLs, save text queries
+    text_sources = []
+    for source in sources:
+        src_path = Path(source)
+        if src_path.exists() and src_path.is_file():
+            # Local file — copy to evidence/
+            dest = evidence_dir / src_path.name
+            shutil.copy2(src_path, dest)
+            click.echo(f"[+] Скопирован: {src_path.name}")
+        elif source.startswith(("http://", "https://")):
+            # URL — download to evidence/
+            try:
+                dest = download_file(source, evidence_dir)
+                click.echo(f"[+] Скачан: {dest.name}")
+            except Exception as e:
+                click.echo(f"[-] Ошибка скачивания {source}: {e}")
+        else:
+            # Text query — save to sources.txt
+            text_sources.append(source)
+
+    # Save text queries if any
+    if text_sources:
+        sources_txt = evidence_dir / "sources.txt"
+        sources_txt.write_text("\n".join(text_sources), encoding="utf-8")
+        click.echo(f"[+] Текстовые запросы сохранены в sources.txt")
+
     config = {
         "name": name,
         "company": company,
