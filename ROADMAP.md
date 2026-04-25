@@ -95,7 +95,7 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 
 ## Backlog
 
-- [ ] Process Mining Logging Tests — unit+integration для `ProcessMiningLogger` 🟢
+- [x] Process Mining Logging Tests — unit+integration для `ProcessMiningLogger` (33 tests ✅) 🟢
 - [ ] GigaChat Auto-Recovery — retry + auto-fallback на Ollama 🟢
 - [ ] project_context.md size check перед Stop hook 🟢
 - [ ] OpenClaw SKILL.md adaptation (заморожено до M3) 🟢
