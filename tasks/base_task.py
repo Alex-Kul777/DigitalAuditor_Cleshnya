@@ -75,6 +75,15 @@ class AuditTask:
             for warning in validation.warnings:
                 self.logger.warning(f"Configuration warning: {warning}")
 
+            # Sync evidence files before report generation
+            from knowledge.evidence_indexer import EvidenceIndexer
+            ei = EvidenceIndexer(task_name, self.task_dir / "evidence")
+            synced = ei.sync()
+            if synced:
+                self.logger.info(f"Indexed evidence: {synced}")
+            else:
+                self.logger.info("Evidence: no changes detected")
+
             # Execute audit workflow
             findings = []
             report_start = datetime.now()
