@@ -48,41 +48,40 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `core/config.py` — BRINKS_CHUNK_SIZE constants
 - [x] `knowledge/brinks_chapters.json` — chapter metadata (26 indexed + 7 excluded)
 
-### M_Evidence — Evidence Traceability & Requirements Hierarchy 🔴
+### M_Evidence — Evidence Traceability & Requirements Hierarchy 🟢 COMPLETE (8/8 tasks ✅)
 
 **Why M_Evidence?** Отчёты не содержат ссылок на анализируемые документы. RAG-запросы захардкожены, `evidence/` никогда не индексируется. Каждое наблюдение должно ссылаться на источник (Evidence) и применимые требования (L1 Регулятор / L2 Аудит / L3 Локальный). Система 3-уровневых требований: глобальная ChromaDB с metadata-фильтром (как persona-система, но по `req_level` и `task_name`).
 
 **Tasks:**
-- [ ] Task 1: `knowledge/indexer.py` — metadata schema (doc_type, req_level, page_number, task_name)
-- [ ] Task 2: `knowledge/requirements_indexer.py` (NEW) — L1/L2/L3 requirement library management
-- [ ] Task 3: `knowledge/evidence_indexer.py` (NEW) — SHA-256 incremental indexing per task
-- [ ] Task 4: `main.py create` — copy/download sources → evidence/ (local files, URLs, text queries)
-- [ ] Task 5: `main.py add-requirement` (NEW) — CLI для управления L1/L2/L3
-- [ ] Task 6: `tasks/base_task.py execute()` — sync evidence before report generation
-- [ ] Task 7: `report_generator/orchestrator.py` — source-aware prompts + citation enforcement
-- [ ] Task 8: tests — 24 тестов (evidence collection, requirements indexer, citations)
+- [x] Task 1: `knowledge/indexer.py` — metadata schema (doc_type, req_level, page_number, task_name)
+- [x] Task 2: `knowledge/requirements_indexer.py` (NEW) — L1/L2/L3 requirement library management
+- [x] Task 3: `knowledge/evidence_indexer.py` (NEW) — SHA-256 incremental indexing per task
+- [x] Task 4: `main.py create` — copy/download sources → evidence/ (local files, URLs, text queries)
+- [x] Task 5: `main.py add-requirement` (NEW) — CLI для управления L1/L2/L3
+- [x] Task 6: `tasks/base_task.py execute()` — sync evidence before report generation
+- [x] Task 7: `report_generator/orchestrator.py` — source-aware prompts + citation enforcement
+- [x] Task 8: tests — 41 интеграционных тестов (evidence collection, requirements indexer, citations)
 
-### M2 — Reviewer Agent (UncleKahneman) 🔴
-- [ ] `core/llm.py` — `LLMFactory.get_llm(mode="default"|"cheap"|"deep")`
-- [ ] `agents/reviewer_base.py` (NEW) — абстрактный `ReviewerAgent`
-- [ ] `agents/uncle_kahneman.py` (NEW) — S1+S2 two-pass review
-- [ ] `personas/uncle_kahneman/persona_prompt.md`
-- [ ] `tests/agents/test_uncle_kahneman.py`
+### M2 — Reviewer Agent (UncleKahneman) 🟢 COMPLETE (5/5 tasks ✅)
+- [x] `core/llm.py` — `LLMFactory.get_llm(mode="default"|"cheap"|"deep")`
+- [x] `agents/reviewer_base.py` (NEW) — абстрактный `ReviewerAgent` с S1/S2 алгоритмом
+- [x] `agents/uncle_kahneman.py` (NEW) — S1+S2 two-pass review
+- [x] `personas/uncle_kahneman/persona_prompt.md` + persona scaffold
+- [x] `tests/agents/test_uncle_kahneman.py` — 18 unit tests
 
-### M3 — Integration 🟠
-- [ ] `report_generator/orchestrator.py` — reviewer hook после строки 139
-- [ ] `main.py` — `--reviewer` в `run` и `create`
-- [ ] `core/validator.py` — soft warning для unknown reviewer
-- [ ] `tests/integration/test_reviewer_hook.py`
+### M3 — Integration 🟢 COMPLETE (4/4 tasks ✅)
+- [x] `report_generator/orchestrator.py` — reviewer_hook после строки 139
+- [x] `main.py` — `--reviewer` в `run` и `create` командах
+- [x] `core/validator.py` — soft warning для unknown reviewer
+- [x] `tests/integration/test_reviewer_hook.py` — 7 integration tests
 
-### M4 — DOCX Export + Revision Cycle 🟡
-- [ ] `report_generator/docx/backends.py` (NEW) — adapter для 3 библиотек
-- [ ] `report_generator/docx/exporter.py` (NEW) — MD→DOCX+comments
-- [ ] `report_generator/docx/importer.py` (NEW) — DOCX→Feedback
-- [ ] `report_generator/docx/version_manager.py` (NEW) — versions/ + manifest
-- [ ] `agents/revision_agent.py` (NEW) — revision loop
-- [ ] `main.py` — команды `export-docx`, `revise`
-- [ ] `requirements.txt` — python-docx, docx-editor, docx-revisions
+### M4 — DOCX Export + Revision Cycle 🟢 COMPLETE (6/6 tasks ✅)
+- [x] `report_generator/docx/backends.py` (NEW) — adapter для 3 библиотек (PythonDocx, DocxEditor, DocxRevisions)
+- [x] `report_generator/docx/exporter.py` (NEW) — MD→DOCX+comments extraction
+- [x] `report_generator/docx/importer.py` (NEW) — DOCX→Feedback с comment separation
+- [x] `report_generator/docx/version_manager.py` (NEW) — versions/ + manifest tracking
+- [x] `agents/revision_agent.py` (NEW) — LLM-guided revision loop
+- [x] `main.py` — команды `export-docx`, `revise` + `tests/integration/test_docx_cycle.py` (9 tests)
 
 ### M5 — Personalization 🟢
 - [ ] `core/preferences.py` (NEW) — hybrid store global + per-task
