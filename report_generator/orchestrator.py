@@ -43,13 +43,14 @@ class ReportOrchestrator:
             self.logger.warning(f"Unknown auditor: {auditor_type}. Falling back to CISA.")
             return CisaAuditor()
     
-    def _get_context(self, query: str, exclude_personas: list = None) -> str:
-        """Получить релевантный контекст из RAG.
+    def _get_context(self, query: str, exclude_personas: list = None, task_name: str = None) -> str:
+        """Retrieve relevant context from RAG with optional evidence filtering.
 
         Args:
             query: Search query
             exclude_personas: List of persona names to exclude (e.g., ['uncle_kahneman']).
                             If None, excludes all known personas by default (audit-only docs).
+            task_name: Optional task identifier to filter evidence by task (M_Evidence feature)
 
         Returns:
             Context string from retrieved documents or empty string on failure
@@ -62,7 +63,10 @@ class ReportOrchestrator:
                 exclude_personas = persona_indexer.list_personas()
                 self.logger.debug(f"Excluding personas: {exclude_personas}")
 
-            docs = self.retriever.retrieve(query, k=3, exclude_personas=exclude_personas)
+            # Filter by task_name if provided (evidence isolation per task)
+            filter_meta = {"task_name": task_name} if task_name else None
+
+            docs = self.retriever.retrieve(query, k=5, exclude_personas=exclude_personas, filter=filter_meta)
             if docs:
                 context = "\n\n".join([d["content"][:500] for d in docs])
                 return context
