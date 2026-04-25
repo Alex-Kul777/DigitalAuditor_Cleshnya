@@ -285,5 +285,90 @@ def add_requirement(level: str, file_path: str, authority: str):
         logger.error(f"Error adding requirement: {str(e)}", exc_info=True)
         raise SystemExit(1)
 
+@cli.command(name='export-docx')
+@click.option('--task', required=True, help='Название задачи')
+def export_docx(task: str):
+    """Export audit report to DOCX with reviewer comments."""
+    try:
+        from report_generator.docx import DocxExporter, VersionManager
+
+        task_dir = Path(f"tasks/instances/{task}")
+        if not task_dir.exists():
+            raise TaskNotFoundError(task)
+
+        # Load markdown report
+        md_path = task_dir / "output" / "Audit_Report.md"
+        if not md_path.exists():
+            raise FileNotFoundError(f"Audit report not found: {md_path}. Run audit first.")
+
+        # Export to DOCX
+        exporter = DocxExporter()
+        vm = VersionManager(task_dir)
+        next_version = vm.next_version()
+
+        docx_path = task_dir / "output" / "Audit_Report.docx"
+        exporter.export(md_path, docx_path)
+
+        # Save to version archive
+        md_content = md_path.read_text(encoding='utf-8')
+        vm.save(next_version, md_content, docx_path)
+
+        click.echo(f"[+] Exported to DOCX: {docx_path}")
+        click.echo(f"[+] Saved as version {next_version}")
+        logger.info(f"Export complete: {docx_path}")
+
+    except FileNotFoundError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except TaskNotFoundError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except Exception as e:
+        click.echo(f"[-] Error exporting DOCX: {str(e)}", err=True)
+        logger.error(f"Error exporting DOCX: {str(e)}", exc_info=True)
+        raise SystemExit(1)
+
+@cli.command(name='revise')
+@click.option('--task', required=True, help='Название задачи')
+@click.option('--max-iterations', default=1, type=int, help='Max revision iterations')
+def revise(task: str, max_iterations: int):
+    """Apply feedback from reviewed DOCX and generate revised version."""
+    try:
+        from agents.revision_agent import RevisionAgent
+
+        task_dir = Path(f"tasks/instances/{task}")
+        if not task_dir.exists():
+            raise TaskNotFoundError(task)
+
+        # Load latest DOCX
+        from report_generator.docx import VersionManager
+        vm = VersionManager(task_dir)
+        latest_docx = vm.latest()
+
+        if not latest_docx:
+            raise FileNotFoundError(f"No DOCX found for task: {task}. Run export-docx first.")
+
+        # Revise via agent
+        agent = RevisionAgent(temperature=0.3)
+        revised_docx = agent.revise(task_dir)
+
+        click.echo(f"[+] Revision applied: {revised_docx}")
+        logger.info(f"Revision complete: {revised_docx}")
+
+    except FileNotFoundError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except TaskNotFoundError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except Exception as e:
+        click.echo(f"[-] Error revising: {str(e)}", err=True)
+        logger.error(f"Error revising: {str(e)}", exc_info=True)
+        raise SystemExit(1)
+
 if __name__ == "__main__":
     cli()
