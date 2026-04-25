@@ -11,7 +11,7 @@
 <!-- User content. Never auto-pruned. -->
 
 ### Current Focus
-**M_Robert — uncle_Robert Primary Auditor** (7/9 tasks complete)
+**M_Robert — uncle_Robert Primary Auditor** (8/9 tasks complete 🟢)
 - [x] `personas/uncle_robert/config.yaml` + `persona_prompt.md` + `persona_context.md` — scaffolding + config
 - [x] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG
 - [x] `report_generator/ccce_formatter.py` (NEW) — CCCE findings formatter
@@ -20,9 +20,10 @@
 - [x] `tests/agents/test_uncle_robert.py` — 14 unit тестов
 - [x] `core/config.py` — BRINKS_CHUNK_SIZE + BRINKS_CHAPTERS_INDEX constants
 - [x] `knowledge/brinks_chapters.json` — chapter metadata (33 chapters, include_in_rag flags)
-- [ ] Task 2: `build-persona uncle_robert --corpus` — ingest PDF в ChromaDB (pending: indexing logic)
+- [x] Task 2: `knowledge/brinks_indexer.py` (NEW) — PDF indexing с chapter filtering (5,519 chunks indexed)
+- [x] `tests/knowledge/test_brinks_indexer.py` — 13 unit тестов (все passing)
 
-**Status:** IN PROGRESS (core structure 100% complete, PDF indexing pending). 
+**Status:** COMPLETE (Task 2 ✅ — 5,519 chunks from 26 chapters indexed in ChromaDB). 
 **Plan:** [.claude/plans/uncle-robert-auditor.md](.claude/plans/uncle-robert-auditor.md)
 **Architecture:** IIA Standards (Chapter 8) + Brink's 7th Edition (chapters 3-34), CCCE findings format, Draft→Final two-stage pipeline. CLI flag: `python main.py run --task <name> --auditor uncle_robert`
 

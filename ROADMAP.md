@@ -30,7 +30,7 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `main.py` — команда `build-persona` + 5 tests (Task 7 DONE)
 - [x] `tests/knowledge/test_persona_filter.py` — 40 tests total (19+9+6+5) ✅ M1 COMPLETE
 
-### M_Robert — uncle_Robert Primary Auditor 🟢 IN PROGRESS
+### M_Robert — uncle_Robert Primary Auditor 🟢 COMPLETE (8/9 tasks ✅)
 
 **Why M_Robert?** Альтернативный ведущий аудитор на основе IIA Professional Practices Framework и Brink's Modern Internal Auditing methodology. Активируется через `--auditor uncle_robert` флаг в CLI. Использует CCCE format (Condition/Criteria/Cause/Effect) для наблюдений и Draft→Final two-stage pipeline.
 
@@ -38,14 +38,15 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 
 **Tasks:**
 - [x] `personas/uncle_robert/config.yaml` + `persona_prompt.md` + `persona_context.md` — scaffolding + configuration (Task 1)
-- [ ] `python main.py build-persona uncle_robert` — ingest PDF corpus в ChromaDB (Task 2)
+- [x] `python main.py build-persona uncle_robert` — ingest PDF corpus с chapter filtering (Task 2) ✅
 - [x] `agents/uncle_robert.py` (NEW) — UncleRobertAgent с Brink's RAG retrieval (Task 3)
 - [x] `report_generator/ccce_formatter.py` (NEW) — CCCE findings format (Task 4)
 - [x] `report_generator/orchestrator.py` — auditor dispatcher (Task 5)
 - [x] `main.py` — `--auditor` флаг в `run` команде (Task 6)
 - [x] `tests/agents/test_uncle_robert.py` — 14 unit tests (Task 7)
+- [x] `knowledge/brinks_indexer.py` (NEW) — BrinksIndexer with chapter-based filtering + 13 tests
 - [x] `core/config.py` — BRINKS_CHUNK_SIZE constants
-- [x] `knowledge/brinks_chapters.json` — chapter metadata with RAG flags
+- [x] `knowledge/brinks_chapters.json` — chapter metadata (26 indexed + 7 excluded)
 
 ### M_Evidence — Evidence Traceability & Requirements Hierarchy 🔴
 
