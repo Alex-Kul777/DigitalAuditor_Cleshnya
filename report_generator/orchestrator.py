@@ -5,6 +5,7 @@ from knowledge.retriever import Retriever
 from core.logger import setup_logger
 from core.llm import get_llm
 import json
+import re
 from datetime import datetime
 
 class ReportOrchestrator:
@@ -73,6 +74,109 @@ class ReportOrchestrator:
         except Exception as e:
             self.logger.warning(f"RAG retrieval failed: {e}")
         return ""
+
+    def _get_criteria_context(self, query: str) -> str:
+        """Retrieve requirements context (L1/L2/L3) from RAG.
+
+        Args:
+            query: Search query for criteria/standards
+
+        Returns:
+            Criteria context string or empty string on failure
+        """
+        try:
+            filter_meta = {"doc_type": {"$in": ["regulatory", "audit_standard", "local_policy"]}}
+            docs = self.retriever.retrieve(query, k=8, exclude_personas=[], filter=filter_meta)
+            if docs:
+                context = "\n\n".join([d["content"][:300] for d in docs])
+                return context
+        except Exception as e:
+            self.logger.warning(f"Criteria context retrieval failed: {e}")
+        return ""
+
+    def _build_findings_prompt(self, company: str, task_name: str) -> str:
+        """Build findings prompt with evidence and criteria context.
+
+        Args:
+            company: Company name
+            task_name: Task identifier for evidence filtering
+
+        Returns:
+            Enhanced findings prompt with context
+        """
+        sources = self.config.get('sources', [])
+        sources_ctx = ", ".join(sources) if sources else company
+
+        evidence_ctx = self._get_context(
+            f"аудит {sources_ctx} нарушения проблемы риски",
+            task_name=task_name
+        )
+        criteria_ctx = self._get_criteria_context(f"требования стандарты {sources_ctx}")
+
+        prompt = f"""Ты — опытный аудитор CISA. Анализируй материалы о {sources_ctx}.
+
+КОНТЕКСТ ИЗ ИСТОЧНИКА (Evidence):
+{evidence_ctx or 'Контекст не найден — анализируй по общим принципам'}
+
+ПРИМЕНИМЫЕ ТРЕБОВАНИЯ (L1/L2/L3):
+{criteria_ctx or 'Требования не загружены — используй CISA/COBIT/ISO 27001'}
+
+Сгенерируй 3-5 наблюдений в формате:
+
+### Наблюдение [номер]: [заголовок]
+
+**Состояние (Condition):** [описание текущей ситуации]
+
+**Критерий (Criteria):** [ссылка на стандарт]
+
+**Причина (Cause):** [корневая причина]
+
+**Последствия (Impact):** [влияние на бизнес]
+
+**Риск:** [High/Medium/Low]
+
+**Рекомендация (Recommendation):** [конкретное действие]
+
+**Срок устранения:** [разумный срок]
+
+**Источники:**
+| Тип | Документ | Стр. | Цитата |
+|-----|----------|------|--------|
+| Evidence | [имя файла] | [N] | "[цитата]" |
+| L1 (Регулятор) | [файл] | [N] | "[текст требования]" |
+| L2 (Аудит) | [файл] | [N] | "[текст стандарта]" |
+| L3 (Локальный) | [файл или N/A] | [N] | "[текст или N/A]" |
+
+КРИТИЧНО: Каждое наблюдение ДОЛЖНО содержать таблицу источников."""
+        return prompt
+
+    def _validate_citations(self, report_text: str) -> bool:
+        """Validate presence of citation tables in findings.
+
+        Args:
+            report_text: Generated findings text
+
+        Returns:
+            True if 80%+ of findings have citations, False otherwise
+        """
+        findings_count = report_text.count("### Наблюдение")
+        citations_count = len(re.findall(r"\| Evidence \|", report_text))
+
+        if findings_count == 0:
+            return True
+
+        citation_ratio = citations_count / findings_count
+        is_valid = citation_ratio >= 0.8
+
+        if not is_valid:
+            self.logger.warning(
+                f"Citation validation: {citations_count}/{findings_count} findings "
+                f"({citation_ratio*100:.0f}%) have citations (threshold: 80%)"
+            )
+        else:
+            self.logger.info(f"Citation validation passed: {citation_ratio*100:.0f}%")
+
+        return is_valid
     
     def generate(self, findings: list = None) -> Path:
         self.logger.info("Starting report generation")
@@ -130,33 +234,16 @@ class ReportOrchestrator:
         
         # Глава 4: Наблюдения
         self.logger.info("Generating Findings...")
-        findings_prompt = f"""Сгенерируй 3 типичных наблюдения для ИТ-аудита компании "{company}".
-Для каждого наблюдения используй формат:
+        task_name = self.config.get('name', '')
+        findings_prompt = self._build_findings_prompt(company, task_name)
 
-### Наблюдение [номер]: [заголовок]
-
-**Состояние (Condition):**
-[описание текущей ситуации]
-
-**Критерий (Criteria):**
-[ссылка на стандарт CISA или нормативный документ]
-
-**Причина (Cause):**
-[корневая причина]
-
-**Последствия (Impact):**
-[влияние на бизнес]
-
-**Риск:** [High/Medium/Low]
-
-**Рекомендация (Recommendation):**
-[конкретное действие]
-
-**Срок устранения:** [разумный срок]
-
-Разделяй наблюдения пустой строкой."""
-        
         findings_text = self.auditor.generate_section(findings_prompt)
+
+        # Validate citations in findings
+        is_valid = self._validate_citations(findings_text)
+        if not is_valid:
+            self.logger.warning("Findings may lack proper citations — consider regenerating")
+
         (self.drafts_dir / "04_findings.md").write_text(findings_text, encoding='utf-8')
         
         # Глава 5: Заключение
