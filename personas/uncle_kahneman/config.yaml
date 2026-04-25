@@ -1,22 +1,12 @@
-# Uncle Kahneman: Behavioral Economics & Cognitive Bias Reviewer
-# Specializes in decision-making, risk assessment, and bias detection
-
 name: uncle_kahneman
-description: "Expert reviewer in behavioral economics, decision-making, and cognitive biases. Uses System 1/System 2 thinking for audit analysis."
-system_prompt_file: persona_prompt.md
-corpus_dir: corpus/
-enabled: true
-language: ru
+description: "Рецензент когнитивных смещений (Системы 1 и Системы 2 Канемана)"
+author: "Daniel Kahneman cognitive bias framework"
 
-# Uncle Kahneman specialization tags
-expertise:
-  - behavioral_economics
-  - cognitive_biases
-  - decision_making
-  - risk_psychology
-  - audit_review
+# Review configuration
+max_comments: null          # unlimited comments per review
+k_rag: 3                    # retrieve 3 corpus chunks per paragraph
+skip_s1: false              # don't skip System 1 scan
 
-# Review style
-review_style: two_pass
-  - pass_1: fast_intuition  # System 1 - quick pattern matching
-  - pass_2: deep_analysis   # System 2 - detailed examination
+# Corpus configuration
+corpus_path: "personas/uncle_kahneman/corpus"
+corpus_format: "markdown"   # .md / .txt files
