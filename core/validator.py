@@ -148,6 +148,21 @@ class InputValidator:
                     actual=type(sources).__name__,
                 )
 
+        # Validate reviewer (optional, soft warning for unknown reviewers)
+        if "reviewer" in config:
+            reviewer_name = config.get("reviewer")
+            if reviewer_name:
+                try:
+                    from knowledge.persona_indexer import PersonaIndexer
+                    known_personas = PersonaIndexer().list_personas()
+                    if reviewer_name not in known_personas:
+                        result.add_warning(
+                            f"Unknown reviewer '{reviewer_name}'. Known: {', '.join(known_personas) or 'none yet'}"
+                        )
+                except Exception as e:
+                    # Silent fail on persona indexer errors
+                    pass
+
         return result
 
     @staticmethod
