@@ -237,5 +237,47 @@ def build_persona(name: str, corpus: str = None):
         logger.error(f"Error building persona '{name}': {str(e)}", exc_info=True)
         raise SystemExit(1)
 
+@cli.command(name='add-requirement')
+@click.option('--level', required=True, type=click.Choice(['1', '2', '3']),
+              help='1=regulatory, 2=audit standard, 3=local policy')
+@click.option('--file', 'file_path', required=True, help='Path to requirement document')
+@click.option('--authority', default=None, help='Authority (ISO, ISACA, FSTEC, Brink\'s, internal, user_defined)')
+def add_requirement(level: str, file_path: str, authority: str):
+    """Add requirement document to L1/L2/L3 library."""
+    try:
+        from knowledge.requirements_indexer import RequirementsIndexer
+
+        ri = RequirementsIndexer()
+        chunks = ri.add_requirement(file_path, int(level), authority)
+
+        level_names = {
+            "1": "Regulatory (L1)",
+            "2": "Audit Standard (L2)",
+            "3": "Local Policy (L3)"
+        }
+
+        click.echo(f"[+] Added {level_names[level]} requirement: {Path(file_path).name}")
+        click.echo(f"[+] Indexed {chunks} chunks")
+
+        # List all requirements by level
+        reqs = ri.list_requirements()
+        click.echo("\n[=] Requirements Library:")
+        for lvl, files in reqs.items():
+            file_list = ", ".join(files) if files else "(empty)"
+            click.echo(f"    L{lvl}: {file_list}")
+
+    except FileNotFoundError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except ValueError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except Exception as e:
+        click.echo(f"[-] Error adding requirement: {str(e)}", err=True)
+        logger.error(f"Error adding requirement: {str(e)}", exc_info=True)
+        raise SystemExit(1)
+
 if __name__ == "__main__":
     cli()
