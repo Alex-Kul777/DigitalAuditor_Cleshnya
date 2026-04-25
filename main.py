@@ -29,7 +29,8 @@ def cli():
 @click.option('--company', required=True, help='Название компании')
 @click.option('--sources', multiple=True, help='Источники (файлы, URL, текстовые запросы)')
 @click.option('--audit-type', default='it', help='Тип аудита')
-def create(name: str, company: str, sources: tuple, audit_type: str):
+@click.option('--reviewer', default=None, help='Рецензент для отчёта (uncle_kahneman)')
+def create(name: str, company: str, sources: tuple, audit_type: str, reviewer: str):
     """Create a new audit task with optional evidence sources."""
     task_dir = Path(f"tasks/instances/{name}")
     task_dir.mkdir(parents=True, exist_ok=True)
@@ -72,6 +73,8 @@ def create(name: str, company: str, sources: tuple, audit_type: str):
         "sources": list(sources),
         "created": datetime.now().isoformat()
     }
+    if reviewer:
+        config["reviewer"] = reviewer
     (task_dir / "config.yaml").write_text(yaml.dump(config), encoding='utf-8')
     click.echo(f"[+] Задача '{name}' создана в {task_dir}")
 
@@ -81,8 +84,9 @@ def create(name: str, company: str, sources: tuple, audit_type: str):
               help='Тип аудитора (default: cisa)')
 @click.option('--llm-provider', default=None, help='LLM провайдер (ollama, gigachat, anthropic, openai)')
 @click.option('--llm-model', default=None, help='Модель LLM')
+@click.option('--reviewer', default=None, help='Переопределить рецензента (uncle_kahneman)')
 @click.option('--debug-level', type=int, default=None, help='Уровень отладки (0-3)')
-def run(task: str, auditor: str, llm_provider: str, llm_model: str, debug_level: int):
+def run(task: str, auditor: str, llm_provider: str, llm_model: str, reviewer: str, debug_level: int):
     """Run an audit task with validation and error handling."""
     try:
         import os
@@ -100,6 +104,8 @@ def run(task: str, auditor: str, llm_provider: str, llm_model: str, debug_level:
         if llm_model:
             os.environ['OLLAMA_MODEL'] = llm_model
             os.environ['GIGACHAT_MODEL'] = llm_model
+        if reviewer:
+            os.environ['DA_REVIEWER_OVERRIDE'] = reviewer
         if debug_level is not None:
             if debug_level == 0:
                 os.environ['LOG_LEVEL'] = 'CRITICAL'
