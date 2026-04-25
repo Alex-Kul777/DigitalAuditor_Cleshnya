@@ -170,7 +170,7 @@ def build_persona(name: str, corpus: str = None):
         persona_dir = persona_indexer.scaffold(name)
         click.echo(f"[+] Persona '{name}' scaffolded at: {persona_dir}")
 
-        # Ingest corpus if provided
+        # Ingest corpus if provided, or auto-ingest for uncle_robert
         if corpus:
             corpus_path = Path(corpus)
             if not corpus_path.exists():
@@ -179,6 +179,18 @@ def build_persona(name: str, corpus: str = None):
             logger.info(f"Ingesting corpus from {corpus_path} for persona '{name}'")
             chunk_count = persona_indexer.ingest_corpus(name, str(corpus_path))
             click.echo(f"[+] Indexed {chunk_count} chunks for persona '{name}'")
+        elif name == "uncle_robert":
+            # Auto-ingest Brink's PDF for uncle_robert
+            logger.info(f"Auto-ingesting Brink's corpus for persona '{name}'")
+            try:
+                chunk_count = persona_indexer.ingest_corpus(name)
+                if chunk_count > 0:
+                    click.echo(f"[+] Indexed {chunk_count} chunks for persona '{name}'")
+                else:
+                    click.echo(f"[!] No chunks indexed for persona '{name}' (Brink's PDF not found or empty)", err=True)
+            except Exception as e:
+                logger.warning(f"Auto-indexing failed for uncle_robert: {e}")
+                click.echo(f"[!] Corpus ingestion optional: {str(e)}", err=True)
 
         # List available personas
         personas = persona_indexer.list_personas()

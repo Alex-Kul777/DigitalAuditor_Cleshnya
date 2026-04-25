@@ -3,6 +3,7 @@ from langchain_community.document_loaders import TextLoader, PyPDFLoader
 from core.config import PROJECT_ROOT
 from core.logger import setup_logger
 from knowledge.indexer import VectorIndexer
+from knowledge.brinks_indexer import BrinksIndexer
 
 
 class PersonaIndexer:
@@ -62,23 +63,46 @@ Define the persona's role, expertise, and behavior.
         self.logger.info(f"Scaffolded persona directory: {persona_dir}")
         return persona_dir
 
-    def ingest_corpus(self, persona_name: str, docs_path: str) -> int:
+    def ingest_corpus(self, persona_name: str, docs_path: str = None) -> int:
         """Index documents from a directory for a specific persona.
 
         Args:
             persona_name: Name of the persona
-            docs_path: Path to directory containing documents
+            docs_path: Path to directory/file containing documents. If None for uncle_robert,
+                      auto-detects Brink's PDF from persona directory.
 
         Returns:
             Number of chunks indexed
         """
+        # Auto-detect Brink's PDF for uncle_robert if no corpus provided
+        if persona_name == "uncle_robert" and docs_path is None:
+            brinks_pdf = self.personas_dir / "uncle_Robert" / "brink_s-modern-internal-auditing-7th-edition.pdf"
+            if brinks_pdf.exists():
+                self.logger.info(f"Auto-detected Brink's PDF: {brinks_pdf}")
+                docs_path = str(brinks_pdf)
+            else:
+                self.logger.warning(f"Brink's PDF not found at {brinks_pdf}")
+                return 0
+
+        if docs_path is None:
+            raise ValueError(f"No corpus path provided for '{persona_name}'")
+
         self.logger.info(f"Ingesting corpus for '{persona_name}' from {docs_path}")
 
         docs_path = Path(docs_path)
         if not docs_path.exists():
             raise FileNotFoundError(f"Corpus path does not exist: {docs_path}")
 
-        # Load documents from directory
+        # Special handling for uncle_robert: use Brink's chapter-based indexing
+        if persona_name == "uncle_robert" and docs_path.name.lower().startswith("brink"):
+            self.logger.info("Using BrinksIndexer for uncle_robert persona")
+            brinks_indexer = BrinksIndexer()
+            results = brinks_indexer.index_brinks(str(docs_path))
+            total_chunks = sum(results.values())
+            self.logger.info(f"Indexed {len(results)} Brink's chapters ({total_chunks} chunks total)")
+            return total_chunks
+
+        # Generic document indexing for other personas
         documents = self._load_documents_from_directory(docs_path)
         self.logger.info(f"Loaded {len(documents)} documents from {docs_path}")
 

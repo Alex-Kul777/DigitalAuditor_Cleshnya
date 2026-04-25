@@ -1,0 +1,5 @@
+# Persona Configuration: uncle_robert
+name: uncle_robert
+description: ""
+system_prompt_file: persona_prompt.md
+corpus_dir: corpus/
