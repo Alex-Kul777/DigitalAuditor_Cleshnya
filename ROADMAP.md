@@ -91,18 +91,18 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `config/user_preferences.yaml.example` — example with all options
 - [x] `tests/test_preferences.py` — 19 unit tests
 
-### M6 — README Maintenance Automation 🔵 IN PROGRESS (0/5 tasks)
+### M6 — README Maintenance Automation 🟢 COMPLETE (5/5 tasks ✅)
 
 **Why M6?** Features ship faster than README updates. Auto-sync README (EN + RU), CHANGELOG, project structure, test counts from code state + PR metadata. No manual README maintenance.
 
 **Plan:** [.omc/plans/readme_maintenance_strategy.md](.omc/plans/readme_maintenance_strategy.md)
 
 **Tasks:**
-- [ ] Task 1: Create `CHANGELOG.md` (Keep a Changelog format) with M1-M5 entries
-- [ ] Task 2: Build `.github/scripts/generate_readme.py` (parse CHANGELOG, scan dirs, count tests, auto-translate EN→RU)
-- [ ] Task 3: Generate `README.md` + `README_RU.md` (auto-gen + manual sections)
-- [ ] Task 4: Create GitHub Actions workflows (validate on PR, auto-commit on merge, CHANGELOG auto-gen)
-- [ ] Task 5: Write tests (auto-gen logic, workflow execution, translation accuracy)
+- [x] Task 1: Create `CHANGELOG.md` (Keep a Changelog format) with M1-M5 entries
+- [x] Task 2: Build `.github/scripts/generate_readme.py` (parse CHANGELOG, scan dirs, count tests, auto-translate EN→RU)
+- [x] Task 3: Generate `README.md` + `README_RU.md` (auto-gen + manual sections)
+- [x] Task 4: Create GitHub Actions workflows (validate on PR, auto-commit on merge, CHANGELOG auto-gen)
+- [x] Task 5: Write 27 tests for auto-gen logic + workflow execution + translation accuracy (100% pass rate)
 
 ---
 
