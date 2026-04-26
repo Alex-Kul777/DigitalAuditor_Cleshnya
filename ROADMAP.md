@@ -104,11 +104,27 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] Task 4: Create GitHub Actions workflows (validate on PR, auto-commit on merge, CHANGELOG auto-gen)
 - [x] Task 5: Write 27 tests for auto-gen logic + workflow execution + translation accuracy (100% pass rate)
 
+### M7 — Unified Logging System 🟢 COMPLETE (5/5 tasks ✅)
+
+**Why M7?** Logging is fragmented: `audit.log` (text), `process_logs/process_mining_log.txt` (separate format). No unified way to trace LLM calls, retriever operations, internal steps. Multiple formats require separate parsers.
+
+Solution: Single ProcessMiningLogger writing to 3 formats (TXT + CSV + JSON) with 6 configurable detail levels (ERROR/WARNING/INFO/DEBUG-1/2/3), auto-extracting call stack (module/method/line) via inspect.
+
+**Plan:** [.claude/plans/m7-unified-logging.md](.claude/plans/m7-unified-logging.md)
+
+**Tasks:**
+- [x] Task 1: `core/unified_logger.py` — UnifiedLogger + TxtWriter/CsvWriter/JsonWriter classes (300+ lines)
+- [x] Task 2: `core/logger.py` — refactor to use UnifiedLogger (backward compat with old setup_logger)
+- [x] Task 3: Update all modules (agents/, knowledge/, report_generator/, core/llm.py, tasks/) to use structured logging
+- [x] Task 4: `main.py` — add `--log-level` CLI flag (ERROR/WARNING/INFO/DEBUG-1/2/3)
+- [x] Task 5: `tests/test_unified_logging.py` — 28 tests (writers, call stack, level filtering, formats, integration, backward compat) ✅ ALL PASS
+
 ---
 
 ## Backlog
 
 - [x] Process Mining Logging Tests — unit+integration для `ProcessMiningLogger` (33 tests ✅) 🟢
+- [x] Console output for UnifiedLogger — ConsoleWriter (stdout) + tests ✅ 🟢
 - [ ] GigaChat Auto-Recovery — retry + auto-fallback на Ollama 🟢
 - [ ] project_context.md size check перед Stop hook 🟢
 - [ ] OpenClaw SKILL.md adaptation (заморожено до M3) 🟢
