@@ -224,7 +224,7 @@ GIGACHAT_API_KEY = os.getenv("GIGACHAT_API_KEY", "")
 GIGACHAT_SCOPE = os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_B2B")
 GIGACHAT_MODEL = os.getenv("GIGACHAT_MODEL", "GigaChat-2-Max")
 GIGACHAT_MAX_TOKENS = int(os.getenv("GIGACHAT_MAX_TOKENS", "2000"))
-GIGACHAT_TIMEOUT = int(os.getenv("GIGACHAT_TIMEOUT", "60"))
+GIGACHAT_TIMEOUT = int(os.getenv("GIGACHAT_TIMEOUT", "180"))  # 3min default for slow networks
 GIGACHAT_MAX_RETRIES = int(os.getenv("GIGACHAT_MAX_RETRIES", "3"))
 
 # Claude/Anthropic Configuration

@@ -1,6 +1,7 @@
 import os
 import requests
 from core.logger import setup_logger
+from core.config import GIGACHAT_TIMEOUT, GIGACHAT_MAX_RETRIES
 
 logger = setup_logger("llm")
 
@@ -95,12 +96,18 @@ class LLMFactory:
 
     @classmethod
     def _get_gigachat(cls, temperature: float):
+        api_key = os.getenv("GIGACHAT_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "GigaChat provider requested but GIGACHAT_API_KEY is not set. "
+                "Set it in .env or export GIGACHAT_API_KEY=<your_api_key>"
+            )
         wrapper = GigaChatWrapper(
-            api_key=os.getenv("GIGACHAT_API_KEY"),
+            api_key=api_key,
             model=os.getenv("GIGACHAT_MODEL", "GigaChat-2-Max"),
             temperature=temperature,
-            timeout=int(os.getenv("GIGACHAT_TIMEOUT", "60")),
-            max_retries=int(os.getenv("GIGACHAT_MAX_RETRIES", "3")),
+            timeout=GIGACHAT_TIMEOUT,
+            max_retries=GIGACHAT_MAX_RETRIES,
             scope=os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_B2B")
         )
 
