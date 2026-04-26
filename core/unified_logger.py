@@ -168,15 +168,18 @@ class UnifiedLogger:
 
     @staticmethod
     def _get_call_info() -> tuple:
-        """Extract module, method, line from call stack (skip UnifiedLogger frames)."""
+        """Extract module, method, line from call stack (skip UnifiedLogger and LoggerAdapter frames)."""
         frame = inspect.currentframe()
         try:
-            # Skip frames: _get_call_info -> log/timed -> caller
+            # Skip frames: _get_call_info -> log -> (LoggerAdapter.structured_log) -> actual caller
             while frame:
                 code = frame.f_code
                 module_name = code.co_filename.split('/')[-1].replace('.py', '')
-                # Skip our own module
-                if 'unified_logger' not in code.co_filename:
+                # Skip only core logging infrastructure modules (not files that contain "logger" in name)
+                is_unified_logger = module_name == 'unified_logger'
+                is_logger_adapter = module_name == 'logger'
+
+                if not is_unified_logger and not is_logger_adapter:
                     method = code.co_name
                     line = frame.f_lineno
                     return (module_name, method, line)

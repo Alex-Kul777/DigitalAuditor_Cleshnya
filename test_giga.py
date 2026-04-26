@@ -52,7 +52,7 @@ try:
         verify_ssl_certs=False
     )
     
-    response = llm.invoke("Скажи Привет мир на русском.")
+    response = llm.invoke("Скажи Привет мир всем на русском.")
     print(f"SUCCESS: {response}")
     
 except ImportError:

@@ -1,4 +1,5 @@
 audit_type: it
+auditor: cisa
 company: DigitalAuditor
 created: '2026-04-24T09:40:44.071794'
 name: gogol_audit

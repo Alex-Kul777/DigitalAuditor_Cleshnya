@@ -29,6 +29,6 @@ class Retriever:
         if exclude_personas:
             docs = [doc for doc in docs if doc.metadata.get('persona') not in exclude_personas]
             docs = docs[:k]  # Take only k results
-            self.logger.debug(f"Filtered {len(docs)} results after excluding personas: {exclude_personas}")
+            self.logger.info(f"Filtered {len(docs)} results (excluded {len(exclude_personas)} personas)")
 
         return [{"content": doc.page_content, "metadata": doc.metadata} for doc in docs]
