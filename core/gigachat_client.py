@@ -119,9 +119,13 @@ class GigaChatClient:
                     Messages(role=MessagesRole.USER, content=prompt)
                 ]
 
+                logger.debug(f"[GigaChat] Prompt ({len(prompt)} chars): {prompt[:300]}...")
+
                 self.token_counter.add_prompt(prompt)
                 response = client.chat(Chat(messages=messages))
                 response_text = response.choices[0].message.content
+
+                logger.debug(f"[GigaChat] Response ({len(response_text)} chars): {response_text[:300]}...")
 
                 self.token_counter.add_completion(response_text)
                 self._record_success()
@@ -130,7 +134,9 @@ class GigaChatClient:
                     "provider_invoke", "success",
                     {
                         "context_id": self.context_id,
-                        "attempt_number": attempt + 1
+                        "attempt_number": attempt + 1,
+                        "prompt_len": len(prompt),
+                        "response_len": len(response_text)
                     },
                     level="INFO"
                 )
