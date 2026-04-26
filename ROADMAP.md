@@ -125,6 +125,7 @@ Solution: Single ProcessMiningLogger writing to 3 formats (TXT + CSV + JSON) wit
 
 - [x] Process Mining Logging Tests — unit+integration для `ProcessMiningLogger` (33 tests ✅) 🟢
 - [x] Console output for UnifiedLogger — ConsoleWriter (stdout) + tests ✅ 🟢
+- [ ] Enhanced GigaChat timeout logging — timing details + prompt context + retry info 🟡
 - [ ] GigaChat Auto-Recovery — retry + auto-fallback на Ollama 🟢
 - [ ] project_context.md size check перед Stop hook 🟢
 - [ ] OpenClaw SKILL.md adaptation (заморожено до M3) 🟢
