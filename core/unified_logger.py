@@ -33,7 +33,7 @@ class LogEvent:
     def to_dict(self) -> dict:
         """Convert to dict for JSON/CSV."""
         d = asdict(self)
-        d['metadata'] = json.dumps(d['metadata'] or {})
+        d['metadata'] = json.dumps(d['metadata'] or {}, ensure_ascii=False)
         return d
 
 
@@ -45,7 +45,7 @@ class ConsoleWriter:
 
     def write(self, event: LogEvent):
         """Write one line to console (stdout)."""
-        metadata_str = json.dumps(event.metadata or {}) if event.metadata else ""
+        metadata_str = json.dumps(event.metadata or {}, ensure_ascii=False) if event.metadata else ""
         duration_str = f" | {event.duration_ms}ms" if event.duration_ms else ""
         # Format: [LEVEL] module:method | component | action | metadata
         msg = f"[{event.level}] {event.module}:{event.method}:{event.line} | {event.component}.{event.event_type} | {event.action}{duration_str}"
@@ -65,7 +65,7 @@ class TxtWriter:
 
     def write(self, event: LogEvent):
         """Write one line to TXT log."""
-        metadata_str = json.dumps(event.metadata or {}) if event.metadata else "{}"
+        metadata_str = json.dumps(event.metadata or {}, ensure_ascii=False) if event.metadata else "{}"
         duration_str = f" | {event.duration_ms}ms" if event.duration_ms else ""
         parent_str = f" | parent:{event.parent_event_id}" if event.parent_event_id else ""
         line = (
