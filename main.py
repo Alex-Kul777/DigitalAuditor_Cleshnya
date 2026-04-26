@@ -86,7 +86,9 @@ def create(name: str, company: str, sources: tuple, audit_type: str, reviewer: s
 @click.option('--llm-model', default=None, help='Модель LLM')
 @click.option('--reviewer', default=None, help='Переопределить рецензента (uncle_kahneman)')
 @click.option('--debug-level', type=int, default=None, help='Уровень отладки (0-3)')
-def run(task: str, auditor: str, llm_provider: str, llm_model: str, reviewer: str, debug_level: int):
+@click.option('--log-level', default='INFO', type=click.Choice(['ERROR', 'WARNING', 'INFO', 'DEBUG-1', 'DEBUG-2', 'DEBUG-3']),
+              help='Уровень детализации логирования (default: INFO)')
+def run(task: str, auditor: str, llm_provider: str, llm_model: str, reviewer: str, debug_level: int, log_level: str):
     """Run an audit task with validation and error handling."""
     try:
         import os
@@ -116,8 +118,24 @@ def run(task: str, auditor: str, llm_provider: str, llm_model: str, reviewer: st
             elif debug_level >= 3:
                 os.environ['LOG_LEVEL'] = 'DEBUG'
 
+        # Set unified logger level
+        from core.unified_logger import set_log_level
+        set_log_level(log_level)
+
         # Pre-flight checks
-        logger.info("Running pre-flight checks...")
+        import uuid
+        context_id = str(uuid.uuid4())[:8]
+        logger.structured_log(
+            "pre_flight", "checks_started",
+            {"context_id": context_id},
+            level="INFO"
+        )
+
+        # Check GigaChat availability first (if not explicitly requesting Ollama)
+        if not llm_provider or llm_provider.lower() != 'ollama':
+            from core.gigachat_validator import GigaChatValidator
+            giga_validator = GigaChatValidator(context_id=context_id)
+            giga_available = giga_validator.is_available(reason="pre_flight", context_id=context_id)
 
         # Check Ollama connectivity (skip for GigaChat provider)
         if not llm_provider or llm_provider.lower() != 'gigachat':
@@ -127,7 +145,11 @@ def run(task: str, auditor: str, llm_provider: str, llm_model: str, reviewer: st
                 for error in ollama_check.errors:
                     logger.error(f"  [{error.error_code}] {error.message}")
                 raise OllamaUnavailableError(OLLAMA_BASE_URL)
-            logger.info("✓ Ollama is accessible")
+            logger.structured_log(
+                "pre_flight", "ollama_available",
+                {"context_id": context_id, "base_url": OLLAMA_BASE_URL},
+                level="INFO"
+            )
 
         # Set auditor in task config
         import yaml
@@ -140,13 +162,51 @@ def run(task: str, auditor: str, llm_provider: str, llm_model: str, reviewer: st
         config_path.write_text(yaml.dump(config), encoding='utf-8')
         logger.info(f"Using auditor: {auditor}")
 
+        # Log provider selection before running audit
+        from core.llm import LLMFactory
+        provider = os.getenv("LLM_PROVIDER", "hybrid").lower()
+        if provider == "hybrid":
+            from core.gigachat_validator import GigaChatValidator
+            giga_validator = GigaChatValidator(context_id=context_id)
+            if giga_validator.is_available(reason="pre_audit_check", context_id=context_id):
+                selected_provider = "gigachat"
+                fallback_reason = None
+            else:
+                selected_provider = "ollama"
+                fallback_reason = "gigachat_unavailable"
+        else:
+            selected_provider = provider
+            fallback_reason = None
+
+        logger.structured_log(
+            "pre_flight", "provider_selected",
+            {
+                "context_id": context_id,
+                "provider": selected_provider,
+                "fallback_reason": fallback_reason,
+                "model": os.getenv("GIGACHAT_MODEL" if selected_provider == "gigachat" else "OLLAMA_MODEL", "default")
+            },
+            level="INFO"
+        )
+        click.echo(f"[=] Using LLM provider: {selected_provider}")
+        if fallback_reason:
+            click.echo(f"[=] (fallback reason: {fallback_reason})")
+
         # Run the audit task
         from tasks.base_task import AuditTask
         audit_task = AuditTask(task_dir)
         audit_task.execute()
 
         click.echo(f"[+] Аудит завершен. Отчет в {task_dir}/output/")
-        logger.info(f"Task '{task}' completed successfully")
+        logger.structured_log(
+            "audit", "completed",
+            {
+                "context_id": context_id,
+                "task": task,
+                "provider": selected_provider
+            },
+            level="INFO"
+        )
 
     except TaskNotFoundError as e:
         click.echo(f"[-] {str(e)}", err=True)
