@@ -11,7 +11,8 @@ class EvidenceIndexer:
     """Track and index evidence files with SHA-256 change detection."""
 
     STATE_FILENAME = ".index_state.json"
-    SKIP_FILES = {STATE_FILENAME, "sources.txt"}
+    SKIP_FILES = {STATE_FILENAME, "sources.txt", ".gitkeep"}
+    MIN_CONTENT_LENGTH = 10  # Skip files with <10 bytes of content
 
     def __init__(self, task_name: str, evidence_dir: Path):
         """Initialize EvidenceIndexer for a task.
@@ -72,6 +73,11 @@ class EvidenceIndexer:
         for file_path in self.evidence_dir.iterdir():
             # Skip directories and special files
             if not file_path.is_file() or file_path.name in self.SKIP_FILES:
+                continue
+
+            # Skip empty/tiny files
+            if file_path.stat().st_size < self.MIN_CONTENT_LENGTH:
+                self.logger.debug(f"Skipped (too small): {file_path.name} ({file_path.stat().st_size} bytes)")
                 continue
 
             try:
