@@ -430,5 +430,66 @@ def revise(task: str, max_iterations: int):
         logger.error(f"Error revising: {str(e)}", exc_info=True)
         raise SystemExit(1)
 
+@cli.command(name='convert')
+@click.option('--input', 'input_path', required=True, type=click.Path(exists=True),
+              help='Path to input PDF file')
+@click.option('--translate', is_flag=True, default=False,
+              help='Translate PDF to target language')
+@click.option('--lang', default='ru', show_default=True,
+              help='Target language code for translation')
+@click.option('--markdown', 'to_markdown', is_flag=True, default=False,
+              help='Convert PDF(s) to Markdown')
+@click.option('--chunk-size', 'chunk_size', default=None, type=int,
+              help='Pages per translation batch for large PDFs')
+def convert(input_path: str, translate: bool, lang: str, to_markdown: bool, chunk_size: int | None):
+    """Translate PDF and/or convert to Markdown.
+
+    Examples:
+        # Translate only
+        python main.py convert --input input.pdf --translate --lang ru
+
+        # Convert to Markdown only
+        python main.py convert --input input.pdf --markdown
+
+        # Both operations
+        python main.py convert --input input.pdf --translate --lang ru --markdown
+    """
+    try:
+        from tools.document_converter import translate_pdf, convert_pdf_to_markdown
+        from pathlib import Path
+
+        if not translate and not to_markdown:
+            click.echo("Error: specify at least --translate or --markdown", err=True)
+            raise SystemExit(1)
+
+        input_path = Path(input_path)
+
+        # Step 1: Translate if requested
+        translated_path = None
+        if translate:
+            translated_path = translate_pdf(input_path, lang=lang, chunk_size=chunk_size)
+            click.echo(f"[+] Translated: {translated_path}")
+
+        # Step 2: Convert original to Markdown if requested
+        if to_markdown:
+            md_path = convert_pdf_to_markdown(input_path)
+            click.echo(f"[+] Markdown: {md_path}")
+
+            # Step 3: Convert translated to Markdown if translation exists
+            if translated_path:
+                md_translated = convert_pdf_to_markdown(translated_path)
+                click.echo(f"[+] Markdown (translated): {md_translated}")
+
+    except FileNotFoundError as e:
+        click.echo(f"[-] {str(e)}", err=True)
+        logger.error(str(e))
+        raise SystemExit(1)
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"[-] Error converting document: {str(e)}", err=True)
+        logger.error(f"Error converting document: {str(e)}", exc_info=True)
+        raise SystemExit(1)
+
 if __name__ == "__main__":
     cli()

@@ -45,6 +45,9 @@ presentation/output/
 *.log
 audit.log
 
+# Persona raw PDFs (large, sensitive)
+personas/*/raw/*.pdf
+
 # Models
 *.gguf
 *.bin
