@@ -87,9 +87,11 @@ def translate_pdf(input_path: Path, lang: str = "ru", chunk_size: int | None = N
 def _translate_full(input_path: Path, lang: str) -> Path:
     """Translate full PDF (original behavior)."""
     logger.info(f"Using Google Translate service. Large PDFs may take 5-20 min.")
+    logger.debug(f"PDF size: {input_path.stat().st_size / 1024 / 1024:.1f} MB")
 
     output_dir = input_path.parent / f"{input_path.stem}_{lang}_output"
     output_dir.mkdir(exist_ok=True)
+    logger.debug(f"Created output dir: {output_dir}")
 
     cmd = [
         "pdf2zh",
@@ -103,8 +105,12 @@ def _translate_full(input_path: Path, lang: str) -> Path:
     if log_level.startswith("DEBUG"):
         cmd.insert(1, "--debug")
 
+    logger.debug(f"Running: {' '.join(cmd)}")
+
     try:
+        logger.debug(f"Translation in progress (timeout: 30 min)...")
         subprocess.run(cmd, check=True, timeout=1800)
+        logger.debug(f"pdf2zh subprocess completed successfully")
 
         output_files = list(output_dir.glob("*-mono.pdf"))
         if not output_files:
@@ -259,16 +265,26 @@ def convert_pdf_to_markdown(pdf_path: Path, page_range: tuple[int, int] | None =
     logger.info(f"Converting {pdf_path.name} ({range_str}) → {output_path.name}")
 
     try:
+        logger.debug(f"Importing docling.document_converter...")
         from docling.document_converter import DocumentConverter
 
+        logger.debug(f"Initializing DocumentConverter")
         converter = DocumentConverter()
+
+        logger.debug(f"Starting conversion: {pdf_path.name} (page_range={page_range})")
         if page_range:
             result = converter.convert(str(pdf_path), page_range=page_range)
         else:
             result = converter.convert(str(pdf_path))
-        md_content = result.document.export_to_markdown()
+        logger.debug(f"Conversion succeeded, document has {len(result.document.pages)} pages")
 
+        logger.debug(f"Exporting document to Markdown...")
+        md_content = result.document.export_to_markdown()
+        logger.debug(f"Markdown export complete, size: {len(md_content)} bytes")
+
+        logger.debug(f"Writing to {output_path}")
         output_path.write_text(md_content, encoding="utf-8")
+        logger.debug(f"File written successfully")
         logger.info(f"Conversion complete: {output_path}")
         return output_path
 
