@@ -228,14 +228,15 @@ def _translate_chunked(input_path: Path, lang: str, chunk_size: int) -> Path:
         raise SystemExit(msg)
 
 
-def convert_pdf_to_markdown(pdf_path: Path) -> Path:
+def convert_pdf_to_markdown(pdf_path: Path, page_range: tuple[int, int] | None = None) -> Path:
     """Convert PDF to Markdown using Docling.
 
     Args:
         pdf_path: Path to PDF file
+        page_range: Optional (start, end) tuple for page range (1-based, inclusive)
 
     Returns:
-        Path to output Markdown file (same name, .md extension)
+        Path to output Markdown file (same name, .md extension, or _pN_M.md if page range)
 
     Raises:
         SystemExit: If docling not installed or conversion fails
@@ -248,15 +249,20 @@ def convert_pdf_to_markdown(pdf_path: Path) -> Path:
         logger.error(msg)
         raise SystemExit(msg)
 
-    output_path = pdf_path.with_suffix(".md")
+    if page_range:
+        start, end = page_range
+        output_path = pdf_path.with_name(f"{pdf_path.stem}_p{start}_{end}.md")
+    else:
+        output_path = pdf_path.with_suffix(".md")
 
-    logger.info(f"Converting {pdf_path.name} → {output_path.name}")
+    range_str = f"pages {page_range[0]}-{page_range[1]}" if page_range else "full document"
+    logger.info(f"Converting {pdf_path.name} ({range_str}) → {output_path.name}")
 
     try:
         from docling.document_converter import DocumentConverter
 
         converter = DocumentConverter()
-        result = converter.convert(str(pdf_path))
+        result = converter.convert(str(pdf_path), page_range=page_range)
         md_content = result.document.export_to_markdown()
 
         output_path.write_text(md_content, encoding="utf-8")
@@ -307,7 +313,13 @@ def convert_pdf_to_markdown(pdf_path: Path) -> Path:
     type=int,
     help="Pages per translation batch for large PDFs (None = full file)",
 )
-def main(input_path: str, translate: bool, lang: str, to_markdown: bool, chunk_size: int | None) -> None:
+@click.option(
+    "--pages",
+    "pages_str",
+    default=None,
+    help="Page range for markdown conversion (e.g. 1-20)",
+)
+def main(input_path: str, translate: bool, lang: str, to_markdown: bool, chunk_size: int | None, pages_str: str | None) -> None:
     """Translate PDF and/or convert to Markdown.
 
     Examples:
@@ -327,6 +339,21 @@ def main(input_path: str, translate: bool, lang: str, to_markdown: bool, chunk_s
     input_path = Path(input_path)
     results = []
 
+    # Parse page range if provided
+    page_range = None
+    if pages_str:
+        try:
+            parts = pages_str.split("-")
+            if len(parts) != 2:
+                raise ValueError("Invalid format, use: 1-20")
+            start, end = int(parts[0]), int(parts[1])
+            if start < 1 or end < start:
+                raise ValueError("Start must be >= 1 and <= end")
+            page_range = (start, end)
+        except ValueError as e:
+            click.echo(f"Error: invalid --pages format: {e}", err=True)
+            raise SystemExit(1)
+
     # Step 1: Translate if requested
     translated_path = None
     if translate:
@@ -335,12 +362,12 @@ def main(input_path: str, translate: bool, lang: str, to_markdown: bool, chunk_s
 
     # Step 2: Convert original to Markdown if requested
     if to_markdown:
-        md_path = convert_pdf_to_markdown(input_path)
+        md_path = convert_pdf_to_markdown(input_path, page_range=page_range)
         results.append(f"[+] Markdown: {md_path}")
 
         # Step 3: Convert translated to Markdown if translation exists
         if translated_path:
-            md_translated = convert_pdf_to_markdown(translated_path)
+            md_translated = convert_pdf_to_markdown(translated_path, page_range=page_range)
             results.append(f"[+] Markdown (translated): {md_translated}")
 
     # Output summary

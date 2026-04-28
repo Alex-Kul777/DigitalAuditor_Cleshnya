@@ -441,7 +441,9 @@ def revise(task: str, max_iterations: int):
               help='Convert PDF(s) to Markdown')
 @click.option('--chunk-size', 'chunk_size', default=None, type=int,
               help='Pages per translation batch for large PDFs')
-def convert(input_path: str, translate: bool, lang: str, to_markdown: bool, chunk_size: int | None):
+@click.option('--pages', 'pages_str', default=None,
+              help='Page range for markdown conversion (e.g. 1-20)')
+def convert(input_path: str, translate: bool, lang: str, to_markdown: bool, chunk_size: int | None, pages_str: str | None):
     """Translate PDF and/or convert to Markdown.
 
     Examples:
@@ -464,6 +466,21 @@ def convert(input_path: str, translate: bool, lang: str, to_markdown: bool, chun
 
         input_path = Path(input_path)
 
+        # Parse page range if provided
+        page_range = None
+        if pages_str:
+            try:
+                parts = pages_str.split("-")
+                if len(parts) != 2:
+                    raise ValueError("Invalid format, use: 1-20")
+                start, end = int(parts[0]), int(parts[1])
+                if start < 1 or end < start:
+                    raise ValueError("Start must be >= 1 and <= end")
+                page_range = (start, end)
+            except ValueError as e:
+                click.echo(f"Error: invalid --pages format: {e}", err=True)
+                raise SystemExit(1)
+
         # Step 1: Translate if requested
         translated_path = None
         if translate:
@@ -472,12 +489,12 @@ def convert(input_path: str, translate: bool, lang: str, to_markdown: bool, chun
 
         # Step 2: Convert original to Markdown if requested
         if to_markdown:
-            md_path = convert_pdf_to_markdown(input_path)
+            md_path = convert_pdf_to_markdown(input_path, page_range=page_range)
             click.echo(f"[+] Markdown: {md_path}")
 
             # Step 3: Convert translated to Markdown if translation exists
             if translated_path:
-                md_translated = convert_pdf_to_markdown(translated_path)
+                md_translated = convert_pdf_to_markdown(translated_path, page_range=page_range)
                 click.echo(f"[+] Markdown (translated): {md_translated}")
 
     except FileNotFoundError as e:
