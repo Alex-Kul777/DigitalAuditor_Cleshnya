@@ -262,7 +262,10 @@ def convert_pdf_to_markdown(pdf_path: Path, page_range: tuple[int, int] | None =
         from docling.document_converter import DocumentConverter
 
         converter = DocumentConverter()
-        result = converter.convert(str(pdf_path), page_range=page_range)
+        if page_range:
+            result = converter.convert(str(pdf_path), page_range=page_range)
+        else:
+            result = converter.convert(str(pdf_path))
         md_content = result.document.export_to_markdown()
 
         output_path.write_text(md_content, encoding="utf-8")
