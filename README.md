@@ -13,6 +13,7 @@ AI-powered audit system for IT compliance audits following CISA (Certified Infor
 - DOCX export/import with Track Changes revision cycle
 - Evidence traceability with 3-level requirements hierarchy
 - User preference learning from revision feedback
+- PDF translation (pdf2zh + GigaChat) and Markdown conversion (Docling) — see [docs/document_converter.md](docs/document_converter.md)
 
 ## ✨ What's New (Latest Release)
 
@@ -213,7 +214,6 @@ MIT License — See LICENSE file
 
 - **Author:** Alexey K.
 - **Telegram:** [@auditor2it](https://t.me/auditor2it)
-- **Email:** dudered1917@gmail.com
 
 ---
 

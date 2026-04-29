@@ -201,7 +201,6 @@ MIT License — См. файл LICENSE
 
 - **Автор:** Alexey K.
 - **Telegram:** [@auditor2it](https://t.me/auditor2it)
-- **Email:** dudered1917@gmail.com
 
 ---
 
