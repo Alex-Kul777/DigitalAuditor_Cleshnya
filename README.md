@@ -13,7 +13,6 @@ AI-powered audit system for IT compliance audits following CISA (Certified Infor
 - DOCX export/import with Track Changes revision cycle
 - Evidence traceability with 3-level requirements hierarchy
 - User preference learning from revision feedback
-- PDF translation (pdf2zh + GigaChat) and Markdown conversion (Docling) — see [docs/document_converter.md](docs/document_converter.md)
 
 ## ✨ What's New (Latest Release)
 
@@ -88,6 +87,8 @@ Auto-generated from CHANGELOG:
 
 **tools/**
 - `__init__/`
+- `docling_worker.py`
+- `document_converter.py`
 - `evidence_tracker.py`
 - `file_downloader.py`
 - `risk_matrix.py`
