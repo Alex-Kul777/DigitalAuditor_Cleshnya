@@ -47,6 +47,8 @@ audit.log
 
 # Persona raw PDFs (large, sensitive)
 personas/*/raw/*.pdf
+# But DO include Markdown versions (converted docs)
+!personas/*/raw/*.md
 
 # Models
 *.gguf
