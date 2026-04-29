@@ -234,8 +234,63 @@ def _translate_chunked(input_path: Path, lang: str, chunk_size: int) -> Path:
         raise SystemExit(msg)
 
 
+def _run_docling_subprocess(pdf_path: Path, start_page: int, end_page: int, timeout_sec: int) -> tuple[str, float]:
+    """Run Docling in isolated subprocess. Returns (markdown_content, elapsed_time).
+
+    Subprocess approach: guaranteed memory reclaim via OS process exit + SIGKILL on timeout.
+
+    Args:
+        pdf_path: Path to PDF
+        start_page: Start page (1-based, inclusive)
+        end_page: End page (1-based, inclusive)
+        timeout_sec: Subprocess timeout in seconds
+
+    Returns:
+        (markdown_content, elapsed_time) tuple
+
+    Raises:
+        subprocess.TimeoutExpired: If subprocess exceeds timeout
+        RuntimeError: If subprocess returns non-zero exit code
+    """
+    import sys
+    import tempfile
+    import time
+
+    worker = Path(__file__).parent / "docling_worker.py"
+    if not worker.exists():
+        raise RuntimeError(f"docling_worker.py not found at {worker}")
+
+    # Temp file for subprocess output
+    with tempfile.NamedTemporaryFile(suffix=".md", delete=False, mode="w") as f:
+        tmp_path = f.name
+
+    try:
+        t0 = time.time()
+        proc = subprocess.run(
+            [sys.executable, str(worker), str(pdf_path), str(start_page), str(end_page), tmp_path],
+            capture_output=True,
+            text=True,
+            timeout=timeout_sec,
+            env={**os.environ, "LOG_LEVEL": "DEBUG-1"}
+        )
+        elapsed = time.time() - t0
+
+        if proc.returncode != 0:
+            stderr = proc.stderr.strip()
+            raise RuntimeError(f"Worker failed: {stderr}")
+
+        # Read result
+        md_content = Path(tmp_path).read_text(encoding="utf-8")
+        return md_content, elapsed
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
+
+
 def convert_pdf_to_markdown(pdf_path: Path, page_range: tuple[int, int] | None = None) -> Path:
-    """Convert PDF to Markdown using Docling.
+    """Convert PDF to Markdown using Docling with subprocess isolation.
+
+    Uses 50-page chunks via subprocess (guarantees memory reclaim + hard timeout via SIGKILL).
+    Saves intermediate results to chunks/{pdf_stem}_chunks/ for resume capability.
 
     Args:
         pdf_path: Path to PDF file
@@ -247,6 +302,9 @@ def convert_pdf_to_markdown(pdf_path: Path, page_range: tuple[int, int] | None =
     Raises:
         SystemExit: If docling not installed or conversion fails
     """
+    import sys
+    import time
+
     _check_deps(need_docling=True)
 
     pdf_path = Path(pdf_path)
@@ -256,44 +314,100 @@ def convert_pdf_to_markdown(pdf_path: Path, page_range: tuple[int, int] | None =
         raise SystemExit(msg)
 
     if page_range:
-        start, end = page_range
-        output_path = pdf_path.with_name(f"{pdf_path.stem}_p{start}_{end}.md")
+        start_page, end_page = page_range
+        output_path = pdf_path.with_name(f"{pdf_path.stem}_p{start_page}_{end_page}.md")
+        chunks_dir = pdf_path.parent / "chunks" / f"{pdf_path.stem}_p{start_page}_{end_page}_chunks"
+        total_pages = end_page - start_page + 1
     else:
         output_path = pdf_path.with_suffix(".md")
+        chunks_dir = pdf_path.parent / "chunks" / f"{pdf_path.stem}_chunks"
+        from pypdf import PdfReader
+        total_pages = len(PdfReader(str(pdf_path)).pages)
+        start_page, end_page = 1, total_pages
 
-    range_str = f"pages {page_range[0]}-{page_range[1]}" if page_range else "full document"
+    chunks_dir.mkdir(parents=True, exist_ok=True)
+
+    range_str = f"pages {start_page}-{end_page}" if page_range else "full document"
     logger.info(f"Converting {pdf_path.name} ({range_str}) → {output_path.name}")
+    logger.info(f"Total pages: {total_pages}, Strategy: 50-page chunks + subprocess isolation + resume")
+    logger.debug(f"Chunks dir: {chunks_dir}")
 
-    try:
-        logger.debug(f"Importing docling.document_converter...")
-        from docling.document_converter import DocumentConverter
+    chunk_size = 50
+    md_parts = []
+    failed_chunks = []
 
-        logger.debug(f"Initializing DocumentConverter")
-        converter = DocumentConverter()
+    for chunk_num, chunk_start in enumerate(range(start_page, end_page + 1, chunk_size), 1):
+        chunk_end = min(chunk_start + chunk_size - 1, end_page)
+        chunk_pages = chunk_end - chunk_start + 1
+        chunk_file = chunks_dir / f"chunk_{chunk_num:03d}_p{chunk_start}_{chunk_end}.md"
+        chunk_timeout = 600  # 10 min for 50-page chunk
 
-        logger.debug(f"Starting conversion: {pdf_path.name} (page_range={page_range})")
-        if page_range:
-            result = converter.convert(str(pdf_path), page_range=page_range)
-        else:
-            result = converter.convert(str(pdf_path))
-        logger.debug(f"Conversion succeeded, document has {len(result.document.pages)} pages")
+        # Check if chunk already processed (resume)
+        if chunk_file.exists():
+            logger.info(f"[CHUNK {chunk_num}] pages {chunk_start}-{chunk_end} (cached)")
+            md_parts.append(chunk_file.read_text(encoding="utf-8"))
+            continue
 
-        logger.debug(f"Exporting document to Markdown...")
-        md_content = result.document.export_to_markdown()
-        logger.debug(f"Markdown export complete, size: {len(md_content)} bytes")
+        logger.info(f"[CHUNK {chunk_num} START] pages {chunk_start}-{chunk_end}")
+        chunk_start_time = time.time()
 
-        logger.debug(f"Writing to {output_path}")
-        output_path.write_text(md_content, encoding="utf-8")
-        logger.debug(f"File written successfully")
-        logger.info(f"Conversion complete: {output_path}")
+        # Try full chunk conversion via subprocess
+        try:
+            md_content, elapsed = _run_docling_subprocess(pdf_path, chunk_start, chunk_end, chunk_timeout)
+            chunk_file.write_text(md_content, encoding="utf-8")
+            md_parts.append(md_content)
+            logger.info(f"[CHUNK {chunk_num} DONE] {elapsed:.1f}s {len(md_content)/1024:.1f}KB")
+
+        except subprocess.TimeoutExpired:
+            # Timeout - fall back to per-page
+            elapsed = time.time() - chunk_start_time
+            logger.warning(f"[CHUNK {chunk_num} TIMEOUT] after {elapsed:.1f}s → per-page fallback")
+
+            chunk_md_parts = []
+            for page_num in range(chunk_start, chunk_end + 1):
+                page_file = chunks_dir / f"page_{page_num:04d}.md"
+                if page_file.exists():
+                    chunk_md_parts.append(page_file.read_text(encoding="utf-8"))
+                    continue
+
+                logger.info(f"  [PAGE {page_num} START]")
+                page_start_time = time.time()
+                try:
+                    md_content, elapsed = _run_docling_subprocess(pdf_path, page_num, page_num, 120)
+                    page_file.write_text(md_content, encoding="utf-8")
+                    chunk_md_parts.append(md_content)
+                    logger.info(f"  [PAGE {page_num} DONE] {elapsed:.1f}s")
+                except subprocess.TimeoutExpired:
+                    logger.error(f"  [PAGE {page_num} TIMEOUT] after 120s")
+                except Exception as e:
+                    logger.error(f"  [PAGE {page_num} ERROR] {e}")
+
+            if chunk_md_parts:
+                chunk_md = "\n\n---\n\n".join(chunk_md_parts)
+                chunk_file.write_text(chunk_md, encoding="utf-8")
+                md_parts.append(chunk_md)
+                logger.info(f"[CHUNK {chunk_num} FALLBACK] {len(chunk_md_parts)}/{chunk_pages} pages ({len(chunk_md)/1024:.1f}KB)")
+            else:
+                failed_chunks.append((chunk_start, chunk_end))
+                logger.error(f"[CHUNK {chunk_num} FAILED] all pages failed")
+
+        except Exception as e:
+            logger.error(f"[CHUNK {chunk_num} ERROR] {e}")
+            failed_chunks.append((chunk_start, chunk_end))
+
+    # Merge all chunks
+    if md_parts:
+        full_md = "\n\n---\n\n".join(md_parts)
+        output_path.write_text(full_md, encoding="utf-8")
+
+        logger.info(f"")
+        logger.info(f"[CONVERSION COMPLETE] {output_path}")
+        logger.info(f"  Size: {len(full_md) / 1024:.1f} KB ({len(full_md.splitlines())} lines)")
+        logger.info(f"  Chunks: {len(md_parts)} merged, {len(failed_chunks)} failed")
+        logger.info(f"  Intermediate results saved in: {chunks_dir}")
         return output_path
-
-    except ImportError as e:
-        msg = f"Docling import failed: {e}"
-        logger.error(msg)
-        raise SystemExit(msg)
-    except Exception as e:
-        msg = f"Docling conversion failed: {e}"
+    else:
+        msg = f"Conversion failed: no chunks succeeded"
         logger.error(msg)
         raise SystemExit(msg)
 
