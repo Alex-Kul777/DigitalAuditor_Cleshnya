@@ -71,7 +71,12 @@ class ReportOrchestrator:
 
             docs = self.retriever.retrieve(query, k=5, exclude_personas=exclude_personas, filter=filter_meta)
             if docs:
-                context = "\n\n".join([d["content"][:500] for d in docs])
+                def format_chunk(d: dict) -> str:
+                    meta = d.get("metadata", {})
+                    src = meta.get("source_filename", "?")
+                    pg = meta.get("page_number", "?")
+                    return f"[Source: {src}, p.{pg}]\n{d['content'][:500]}"
+                context = "\n\n".join([format_chunk(d) for d in docs])
                 return context
         except Exception as e:
             self.logger.warning(f"RAG retrieval failed: {e}")
@@ -90,7 +95,12 @@ class ReportOrchestrator:
             filter_meta = {"doc_type": {"$in": ["regulatory", "audit_standard", "local_policy"]}}
             docs = self.retriever.retrieve(query, k=8, exclude_personas=[], filter=filter_meta)
             if docs:
-                context = "\n\n".join([d["content"][:300] for d in docs])
+                def format_chunk(d: dict) -> str:
+                    meta = d.get("metadata", {})
+                    src = meta.get("source_filename", "?")
+                    pg = meta.get("page_number", "?")
+                    return f"[Source: {src}, p.{pg}]\n{d['content'][:300]}"
+                context = "\n\n".join([format_chunk(d) for d in docs])
                 return context
         except Exception as e:
             self.logger.warning(f"Criteria context retrieval failed: {e}")
@@ -109,12 +119,17 @@ class ReportOrchestrator:
         sources = self.config.get('sources', [])
         sources_ctx = ", ".join(sources) if sources else company
 
+        # For RAG queries, use filename stems for better semantic matching
+        # (e.g., "gogol_dead_souls.txt" → "gogol dead souls")
+        evidence_subjects = [Path(s).stem.replace("_", " ").replace("-", " ") for s in sources] if sources else [company]
+        evidence_query = f"аудит {' '.join(evidence_subjects)} нарушения проблемы риски"
+
         # Load user preferences (terminology, tone, format)
         from core.preferences import PreferencesStore
         prefs = PreferencesStore().load(task_name=task_name)
 
         evidence_ctx = self._get_context(
-            f"аудит {sources_ctx} нарушения проблемы риски",
+            evidence_query,
             task_name=task_name
         )
         criteria_ctx = self._get_criteria_context(f"требования стандарты {sources_ctx}")

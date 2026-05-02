@@ -125,10 +125,24 @@ Solution: Single ProcessMiningLogger writing to 3 formats (TXT + CSV + JSON) wit
 
 - [x] Process Mining Logging Tests — unit+integration для `ProcessMiningLogger` (33 tests ✅) 🟢
 - [x] Console output for UnifiedLogger — ConsoleWriter (stdout) + tests ✅ 🟢
+- [ ] M_Converter — PDF Translation & Markdown Conversion ⬜
+  - [ ] `tools/document_converter.py` — `translate_pdf()` + `convert_pdf_to_markdown()` + CLI
+  - [ ] `main.py convert` command
+  - [ ] `.gitignore` — exclude `personas/*/raw/*.pdf`
+  - [ ] `requirements.txt` — add `pdf2zh`, `docling`
+  - [ ] `docs/document_converter.md` — full reference with examples
+  - [ ] Test on `personas/CISA/raw/CISA Review Manual.pdf`
 - [ ] Enhanced GigaChat timeout logging — timing details + prompt context + retry info 🟡
 - [ ] GigaChat Auto-Recovery — retry + auto-fallback на Ollama 🟢
 - [ ] project_context.md size check перед Stop hook 🟢
 - [ ] OpenClaw SKILL.md adaptation (заморожено до M3) 🟢
+- [ ] M_CitationFix — Evidence citation context loss 🔴
+  - [ ] `report_generator/orchestrator.py:74` — добавить `[Source: filename, p.N]` перед каждым чанком в `_get_context()`
+  - [ ] `report_generator/orchestrator.py:93` — то же для `_get_criteria_context()`
+  - [ ] `tasks/instances/gogol_audit/config.yaml` — заполнить `sources: [gogol_dead_souls.txt]`
+  - [ ] `orchestrator.py:117` — query через stem файла (`gogol dead souls`) вместо `gogol_dead_souls.txt`
+  - [ ] (опционально) `tasks/base_task.py` — авто-заполнение `sources` из `evidence/` если список пуст
+  - [ ] Re-run gogol_audit и проверить `| Evidence | gogol_dead_souls.txt |` в отчёте
 
 ---
 
