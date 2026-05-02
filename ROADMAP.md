@@ -30,7 +30,7 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `main.py` — команда `build-persona` + 5 tests (Task 7 DONE)
 - [x] `tests/knowledge/test_persona_filter.py` — 40 tests total (19+9+6+5) ✅ M1 COMPLETE
 
-### M_Robert — uncle_Robert Primary Auditor 🟢 COMPLETE (8/9 tasks ✅)
+### M_Robert — uncle_Robert Primary Auditor 🟡 COMPLETE (9/9 tasks ✅)
 
 **Why M_Robert?** Альтернативный ведущий аудитор на основе IIA Professional Practices Framework и Brink's Modern Internal Auditing methodology. Активируется через `--auditor uncle_robert` флаг в CLI. Использует CCCE format (Condition/Criteria/Cause/Effect) для наблюдений и Draft→Final two-stage pipeline.
 
@@ -47,6 +47,7 @@ Result: Multi-persona framework without mixing concerns. Scale from one auditor 
 - [x] `knowledge/brinks_indexer.py` (NEW) — BrinksIndexer with chapter-based filtering + 13 tests
 - [x] `core/config.py` — BRINKS_CHUNK_SIZE constants
 - [x] `knowledge/brinks_chapters.json` — chapter metadata (26 indexed + 7 excluded)
+- [ ] `personas/uncle_Robert/raw/` — Brink's PDF → markdown EN + RU (chunked translation, Task 9) 🔄 IN PROGRESS
 
 ### M_Evidence — Evidence Traceability & Requirements Hierarchy 🟢 COMPLETE (8/8 tasks ✅)
 
