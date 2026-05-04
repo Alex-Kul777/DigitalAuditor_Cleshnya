@@ -1,0 +1,9 @@
+name: ms_copilot_audit
+company: Microsoft
+audit_type: security
+created: '2026-04-20T15:12:00.000000'
+sources:
+  - "GitHub Copilot Chat"
+  - "Microsoft Copilot documentation"
+  - "OWASP LLM Top 10"
+  - "CISA guidelines"

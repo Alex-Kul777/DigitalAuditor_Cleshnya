@@ -1,0 +1,12 @@
+name: uncle_kahneman
+description: "Рецензент когнитивных смещений (Системы 1 и Системы 2 Канемана)"
+author: "Daniel Kahneman cognitive bias framework"
+
+# Review configuration
+max_comments: null          # unlimited comments per review
+k_rag: 3                    # retrieve 3 corpus chunks per paragraph
+skip_s1: false              # don't skip System 1 scan
+
+# Corpus configuration
+corpus_path: "personas/uncle_kahneman/corpus"
+corpus_format: "markdown"   # .md / .txt files

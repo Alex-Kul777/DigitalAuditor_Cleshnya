@@ -1,0 +1,266 @@
+{
+  "brinks_modern_internal_auditing": {
+    "pdf_path": "personas/uncle_Robert/brink_s-modern-internal-auditing-7th-edition.pdf",
+    "total_pages": 794,
+    "chunk_size": 512,
+    "chapters": [
+      {
+        "number": 1,
+        "title": "Foundations of Internal Auditing",
+        "pages": "3-10",
+        "sections": ["History and Background", "Organization of Book"],
+        "include_in_rag": false
+      },
+      {
+        "number": 2,
+        "title": "The Common Body of Knowledge",
+        "pages": "11-50",
+        "sections": ["CBOK Framework", "Professional Development"],
+        "include_in_rag": false
+      },
+      {
+        "number": 3,
+        "title": "The COSO Framework",
+        "pages": "51-100",
+        "sections": ["Internal Control Framework", "Components", "Implementation"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 4,
+        "title": "COBIT and Other Frameworks",
+        "pages": "101-130",
+        "sections": ["COBIT Overview", "IT Governance", "Alignment with COSO"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 5,
+        "title": "Enterprise Risk Management",
+        "pages": "131-152",
+        "sections": ["ERM Framework", "Risk Identification", "Risk Assessment"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 6,
+        "title": "Risk and Control Self-Assessment",
+        "pages": "153-180",
+        "sections": ["RCSA Methodology", "Facilitation Techniques", "Documentation"],
+        "include_in_rag": true,
+        "priority": "low"
+      },
+      {
+        "number": 7,
+        "title": "Performing Effective Internal Audits",
+        "pages": "181-220",
+        "sections": ["Audit Planning", "Field Survey", "Starting Audit", "Audit Programs", "Fieldwork", "Wrapping Up"],
+        "include_in_rag": true,
+        "priority": "critical"
+      },
+      {
+        "number": 8,
+        "title": "Standards for Professional Practice of Internal Auditing",
+        "pages": "221-250",
+        "sections": ["IIA Standards", "Attribute Standards", "Performance Standards", "Implementation Guidance", "Ethics Codes"],
+        "include_in_rag": true,
+        "priority": "critical"
+      },
+      {
+        "number": 9,
+        "title": "Testing and Evidence",
+        "pages": "251-290",
+        "sections": ["Sampling Techniques", "Assessment Methods", "Evidence Evaluation", "Workpaper Documentation"],
+        "include_in_rag": true,
+        "priority": "high"
+      },
+      {
+        "number": 10,
+        "title": "Analytical Procedures and Benchmarking",
+        "pages": "291-310",
+        "sections": ["Analytical Techniques", "Industry Benchmarking", "Trend Analysis"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 11,
+        "title": "Technology-Based Auditing Techniques",
+        "pages": "311-340",
+        "sections": ["CAATS", "Data Analytics", "Continuous Auditing"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 12,
+        "title": "The Internal Audit Function",
+        "pages": "341-360",
+        "sections": ["Department Organization", "Staffing", "Resource Management"],
+        "include_in_rag": false
+      },
+      {
+        "number": 13,
+        "title": "Compliance Auditing",
+        "pages": "361-380",
+        "sections": ["Regulatory Requirements", "Compliance Programs", "Compliance Reporting"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 14,
+        "title": "Fraud Auditing",
+        "pages": "381-400",
+        "sections": ["Fraud Detection", "Investigation Techniques", "Prevention Strategies"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 15,
+        "title": "Planning and Performing Internal Audits",
+        "pages": "401-430",
+        "sections": ["Understanding Controls", "Performing Procedures", "Wrapping Up", "Preliminary Findings"],
+        "include_in_rag": true,
+        "priority": "high"
+      },
+      {
+        "number": 16,
+        "title": "Documenting Results through Process Modeling and Workapers",
+        "pages": "431-460",
+        "sections": ["Documentation Requirements", "Workpaper Standards", "Process Modeling", "Workpaper Organization"],
+        "include_in_rag": true,
+        "priority": "high"
+      },
+      {
+        "number": 17,
+        "title": "Reporting Internal Audit Results",
+        "pages": "461-490",
+        "sections": ["Report Types", "Finding Elements", "Report Format", "Audit Reporting Cycle", "Communications"],
+        "include_in_rag": true,
+        "priority": "critical"
+      },
+      {
+        "number": 18,
+        "title": "IT General Controls",
+        "pages": "491-520",
+        "sections": ["Access Controls", "System Development", "Operations Management"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 19,
+        "title": "IT Audit and Assurance",
+        "pages": "521-550",
+        "sections": ["IT Risk", "IT Controls Assessment", "IT Audit Procedures"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 20,
+        "title": "IT Service Management",
+        "pages": "551-570",
+        "sections": ["Service Delivery", "IT Operations", "Service Quality"],
+        "include_in_rag": true,
+        "priority": "low"
+      },
+      {
+        "number": 21,
+        "title": "Business Continuity and Disaster Recovery",
+        "pages": "571-590",
+        "sections": ["BCP Planning", "Recovery Procedures", "Testing and Maintenance"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 22,
+        "title": "Cybersecurity Auditing",
+        "pages": "591-620",
+        "sections": ["Threat Assessment", "Security Controls", "Incident Response"],
+        "include_in_rag": true,
+        "priority": "high"
+      },
+      {
+        "number": 23,
+        "title": "Governance",
+        "pages": "621-650",
+        "sections": ["Board of Directors", "Governance Framework", "Board Effectiveness"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 24,
+        "title": "Ethics and Values",
+        "pages": "651-670",
+        "sections": ["Ethics Codes", "Ethical Decision Making", "Culture and Values"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 25,
+        "title": "Fraud and Anti-Bribery",
+        "pages": "671-690",
+        "sections": ["Fraud Risk", "Anti-Bribery Compliance", "Fraud Investigation"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 26,
+        "title": "Anti-Money Laundering",
+        "pages": "691-710",
+        "sections": ["AML Regulations", "AML Controls", "AML Audit Procedures"],
+        "include_in_rag": true,
+        "priority": "low"
+      },
+      {
+        "number": 27,
+        "title": "Certification and Credentials",
+        "pages": "711-730",
+        "sections": ["CIA Certification", "CISA Certification", "Continuing Education"],
+        "include_in_rag": false
+      },
+      {
+        "number": 28,
+        "title": "Continuous Assurance and Auditing",
+        "pages": "731-750",
+        "sections": ["Continuous Monitoring", "Real-time Auditing", "Emerging Technologies"],
+        "include_in_rag": true,
+        "priority": "medium"
+      },
+      {
+        "number": 29,
+        "title": "Advanced Topics in Internal Auditing",
+        "pages": "751-770",
+        "sections": ["Blockchain and Crypto", "AI and Automation", "Future Trends"],
+        "include_in_rag": true,
+        "priority": "low"
+      },
+      {
+        "number": 30,
+        "title": "ISO 31000 and Beyond",
+        "pages": "771-780",
+        "sections": ["ISO Standards", "Risk Management Best Practices"],
+        "include_in_rag": true,
+        "priority": "low"
+      },
+      {
+        "number": 31,
+        "title": "Six Sigma and Lean",
+        "pages": "781-785",
+        "sections": ["Quality Improvement", "Process Optimization"],
+        "include_in_rag": false
+      },
+      {
+        "number": 32,
+        "title": "Knowledge Management",
+        "pages": "786-790",
+        "sections": ["Information Systems", "Documentation"],
+        "include_in_rag": false
+      },
+      {
+        "number": 33,
+        "title": "Glossary",
+        "pages": "791-794",
+        "sections": ["Term Definitions"],
+        "include_in_rag": false
+      }
+    ]
+  }
+}

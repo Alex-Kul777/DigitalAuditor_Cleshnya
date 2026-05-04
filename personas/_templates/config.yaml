@@ -1,0 +1,8 @@
+# Persona Configuration Template
+# Copy this directory and customize for your persona
+
+name: template_persona
+description: "Describe this persona's role and expertise"
+system_prompt_file: persona_prompt.md
+corpus_dir: corpus/
+enabled: true

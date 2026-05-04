@@ -1,0 +1,26 @@
+{
+  "deepseek/deepseek-v3.2": {
+    "latency_ms": 24751.5,
+    "tokens": 530,
+    "success": true
+  },
+  "minimax/minimax-m2.5": {
+    "latency_ms": 9850.4,
+    "tokens": 763,
+    "success": true
+  },
+  "google/gemini-2.5-flash": {
+    "latency_ms": 4157.3,
+    "tokens": 517,
+    "success": true
+  },
+  "anthropic/claude-3.5-sonnet": {
+    "error": "Error code: 404 - {'error': {'message': 'No endpoints found for anthropic/claude-3.5-sonnet.', 'code': 404}, 'user_id': 'user_3CiMjoHauSxHizEoWF0lbjcltQ1'}",
+    "success": false
+  },
+  "nvidia/nemotron-3-super-120b-a12b:free": {
+    "latency_ms": 22332.5,
+    "tokens": 539,
+    "success": true
+  }
+}
