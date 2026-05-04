@@ -72,8 +72,8 @@ Auto-generated from CHANGELOG:
 - `indexer.py`
 - `persona_indexer.py`
 - `raw_docs.py`
+- `requirements.py`
 - `requirements_indexer.py`
-- `retriever.py`
 
 **report_generator/**
 - `__init__/`
@@ -103,6 +103,7 @@ Auto-generated from CHANGELOG:
 **presentation/**
 - `data.py`
 - `generate.py`
+- `output.py`
 - `slides.py`
 
 **process_mining/**
@@ -112,7 +113,7 @@ Auto-generated from CHANGELOG:
 
 ## 🧪 Test Coverage
 
-- **Total Tests:** 0+ unit + integration tests
+- **Total Tests:** 510+ unit + integration tests
 - **Coverage:** 54% (Phase 3 target achieved ✅)
 - **Test Files:** tests/unit/, tests/integration/, tests/smoke/
 
@@ -203,9 +204,7 @@ pytest -v
 - [Development Guide](docs/development/LOGGING_GUIDE.md) — Logging patterns, pipeline tracing
 - [Testing Guide](docs/development/TESTING.md) — Test writing, fixtures, CI/CD
 - [Troubleshooting](docs/development/TROUBLESHOOTING.md) — Common issues and solutions
-- [uncle_Robert Skill Tree](docs/uncle_robert_skills.md) — Brink's methodology skills (cangjie pipeline, 8 SKILL.md, `.omc/skills/` vs `personas/` architecture)
-- [uncle_kahneman Skill Tree](docs/uncle_kahneman_skills.md) — Kahneman cognitive bias catalog (15 SKILL.md, S1/S2 pipeline, corpus/ RAG, 46/46 tests)
-- [ROADMAP](ROADMAP.md) — Milestones M1-M_Cangjie, completed features
+- [ROADMAP](ROADMAP.md) — Milestones M1-M5, completed features
 - [CHANGELOG](CHANGELOG.md) — Version history and release notes
 - [Architecture](docs/GAP_ANALYSIS.md) — System design decisions
 
