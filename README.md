@@ -72,8 +72,8 @@ Auto-generated from CHANGELOG:
 - `indexer.py`
 - `persona_indexer.py`
 - `raw_docs.py`
-- `requirements.py`
 - `requirements_indexer.py`
+- `retriever.py`
 
 **report_generator/**
 - `__init__/`
@@ -103,7 +103,6 @@ Auto-generated from CHANGELOG:
 **presentation/**
 - `data.py`
 - `generate.py`
-- `output.py`
 - `slides.py`
 
 **process_mining/**
@@ -113,7 +112,7 @@ Auto-generated from CHANGELOG:
 
 ## 🧪 Test Coverage
 
-- **Total Tests:** 510+ unit + integration tests
+- **Total Tests:** 0+ unit + integration tests
 - **Coverage:** 54% (Phase 3 target achieved ✅)
 - **Test Files:** tests/unit/, tests/integration/, tests/smoke/
 
