@@ -120,6 +120,42 @@ Solution: Single ProcessMiningLogger writing to 3 formats (TXT + CSV + JSON) wit
 - [x] Task 4: `main.py` — add `--log-level` CLI flag (ERROR/WARNING/INFO/DEBUG-1/2/3)
 - [x] Task 5: `tests/test_unified_logging.py` — 28 tests (writers, call stack, level filtering, formats, integration, backward compat) ✅ ALL PASS
 
+### M_Cangjie — uncle_Robert как исполняемый навык (book2skill) 🟢 COMPLETE (5/5 tasks ✅)
+
+**Why?** uncle_Robert уже имеет RAG (ChromaDB), но только для поиска по тексту. cangjie-skill (`book2skill`) извлекает методологии из Brink's 7th Edition в структурированные SKILL.md с разделами R/I/A1/A2/E/B — это даёт Claude проактивный доступ к конкретным методикам без similarity search.
+
+**Docs:** [docs/uncle_robert_skills.md](docs/uncle_robert_skills.md)  
+**Plan:** [.claude/plans/tingly-stirring-pancake.md](.claude/plans/tingly-stirring-pancake.md)
+
+**Completed:**
+- [x] Task 1: Установить cangjie-skill → `.omc/skills/cangjie/` (SKILL.md + methodology/ + extractors/ + templates/)
+- [x] Task 2: Stage 0–1.5 — Adler разбор + 5 параллельных экстракторов + тройная верификация → 127 кандидатов, 50 верифицированы, 11 отклонены
+- [x] Task 3: Stage 2–3 — 8 SKILL.md (CCCE, evidence, workpaper, tone, criteria, fieldwork, draft-report, risk-planning) + Zettelkasten INDEX с 12 связями
+- [x] Task 4: Stage 4 — Pressure testing: 51 тест-кейс, 100% pass rate (`test-prompts.json` + `test-results.md`)
+- [x] Task 5: Персона-навык `.omc/skills/uncle_robert_persona/SKILL.md` (WRITE + REVIEW режимы)
+
+**Planned (следующая итерация):**
+- [ ] Task 6: `iia-independence-rules` + `audit-report-distribution` (🟡 средний приоритет)
+- [ ] Task 7: `agents/uncle_robert_reviewer.py` + `orchestrator.py:~45` REVIEWERS dict (Python интеграция)
+- [ ] Task 8: `coso-internal-control`, `coso-erm`, `fraud-detection` (🟠 низкий приоритет)
+
+### M_Kahneman — uncle_kahneman Persona Build (book2skill) 🟢 COMPLETE (8/8 tasks ✅)
+
+**Why?** uncle_kahneman Python-агент (S1/S2 pipeline) готов, но `corpus/` пустой — агент работает без знания Канемана. Наполнены оба слоя: `.omc/skills/uncle_kahneman/` (IDE каталог смещений) + `personas/uncle_kahneman/corpus/` (RAG-чанки для Python агента).
+
+**Plan:** [.claude/plans/uncle-kahneman-persona.md](.claude/plans/uncle-kahneman-persona.md)  
+**Sources:** TF&S EN (3.6MB → 1148 KB md) + «Думай медленно» RU (3.7MB → 1922 KB md)
+
+**Tasks:**
+- [x] Task 0: PDF → markdown extraction (`tfs_en.md` 531 стр. + `tfs_ru.md` 377 стр.) via PyMuPDF
+- [x] Task 1: Stage 0 — `BOOK_OVERVIEW.md` (Adler 4-шаговый разбор, 5 частей, 38 глав, приоритеты)
+- [x] Task 2: Stage 1 — `candidates/biases.md` (20 смещений Tier1/2/3) + `s1s2-methodology.md`
+- [x] Task 3: Stage 2 — `rejected/` (peak-end-rule, bernoulli — неаудит-релевантные)
+- [x] Task 4: Stage 3 — 15×SKILL.md (halo, wysiati, anchoring, availability, affect, substitution, cognitive-ease, representativeness, narrative-fallacy, overconfidence, planning-fallacy, framing-effect, loss-aversion, sunk-cost, inside-view) + `INDEX.md` (Zettelkasten 15 связей)
+- [x] Task 5: Stage 4 — `test-prompts.json` (46 кейсов) + `test-results.md` (46/46 = 100% pass, 0 cross-triggers)
+- [x] Task 6: Персона-навык `.omc/skills/uncle_kahneman_persona/SKILL.md` (REVIEW only, S1+S2 workflow)
+- [x] Task 7: `corpus/` — 42 markdown-чанка (TF&S Ch.1-34 + Appendix A) для Python S1/S2 RAG
+
 ---
 
 ## Backlog
