@@ -202,7 +202,9 @@ pytest -v
 - [Development Guide](docs/development/LOGGING_GUIDE.md) — Logging patterns, pipeline tracing
 - [Testing Guide](docs/development/TESTING.md) — Test writing, fixtures, CI/CD
 - [Troubleshooting](docs/development/TROUBLESHOOTING.md) — Common issues and solutions
-- [ROADMAP](ROADMAP.md) — Milestones M1-M5, completed features
+- [uncle_Robert Skill Tree](docs/uncle_robert_skills.md) — Brink's methodology skills (cangjie pipeline, 8 SKILL.md, `.omc/skills/` vs `personas/` architecture)
+- [uncle_kahneman Skill Tree](docs/uncle_kahneman_skills.md) — Kahneman cognitive bias catalog (15 SKILL.md, S1/S2 pipeline, corpus/ RAG, 46/46 tests)
+- [ROADMAP](ROADMAP.md) — Milestones M1-M_Cangjie, completed features
 - [CHANGELOG](CHANGELOG.md) — Version history and release notes
 - [Architecture](docs/GAP_ANALYSIS.md) — System design decisions
 

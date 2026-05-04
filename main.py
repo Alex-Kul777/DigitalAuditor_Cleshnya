@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+#  python main.py run --task gogol_audit --llm-provider gigachat --llm-model GigaChat-2-Max --debug-level 3
+# python test_giga.py    // test gigachat alive
 import click
 import shutil
 from pathlib import Path
@@ -356,17 +358,19 @@ def export_docx(task: str):
         if not task_dir.exists():
             raise TaskNotFoundError(task)
 
-        # Load markdown report
-        md_path = task_dir / "output" / "Audit_Report.md"
-        if not md_path.exists():
-            raise FileNotFoundError(f"Audit report not found: {md_path}. Run audit first.")
+        # Load markdown report — discover any Audit_Report*.md (handles uncle_robert and other personas)
+        output_dir = task_dir / "output"
+        md_candidates = sorted(output_dir.glob("Audit_Report*.md"))
+        if not md_candidates:
+            raise FileNotFoundError(f"No Audit_Report*.md found in {output_dir}. Run audit first.")
+        md_path = md_candidates[-1]  # Take latest alphabetically (uncle_robert sorts after plain)
 
         # Export to DOCX
         exporter = DocxExporter()
         vm = VersionManager(task_dir)
         next_version = vm.next_version()
 
-        docx_path = task_dir / "output" / "Audit_Report.docx"
+        docx_path = task_dir / "output" / (md_path.stem + ".docx")
         exporter.export(md_path, docx_path)
 
         # Save to version archive
