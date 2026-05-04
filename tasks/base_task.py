@@ -84,6 +84,21 @@ class AuditTask:
             else:
                 self.logger.info("Evidence: no changes detected")
 
+            # Auto-populate sources from evidence/ if sources list is empty
+            sources = self.config.get('sources', [])
+            if not sources:
+                evidence_dir = self.task_dir / "evidence"
+                if evidence_dir.exists():
+                    auto_sources = [f.name for f in evidence_dir.iterdir()
+                                   if f.is_file() and f.name not in {'.gitkeep', '.index_state.json'}]
+                    if auto_sources:
+                        self.config['sources'] = auto_sources
+                        config_path = self.task_dir / "config.yaml"
+                        config_path.write_text(yaml.dump(self.config, allow_unicode=True), encoding='utf-8')
+                        self.logger.info(f"Auto-populated sources from evidence/: {auto_sources}")
+                        # Update orchestrator's config as well
+                        self.orchestrator.config = self.config
+
             # Execute audit workflow
             findings = []
             report_start = datetime.now()
