@@ -1,0 +1,14 @@
+audit_type: compliance_fraud
+auditor: uncle_robert
+company: Губернская Гражданская Палата (Губернский город NN)
+created: '2026-05-03'
+name: gogol_audit_v2
+methodology: Brink's Modern Internal Auditing 7th Ed. (Moeller, 2009)
+persona_skills: .omc/skills/uncle_robert/
+sources:
+- gogol_dead_souls.txt
+period: 1835-1842
+framework:
+  L1: Свод Законов Российской Империи (1832), Уложение о наказаниях (1845)
+  L2: COSO Internal Control Framework / IIA Standards
+  L3: Регламент Гражданской Палаты (условный)

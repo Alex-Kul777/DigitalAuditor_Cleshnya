@@ -26,7 +26,7 @@ try:
     
     messages = [
         Messages(role=MessagesRole.SYSTEM, content="Ты ассистент."),
-        Messages(role=MessagesRole.USER, content="Скажи Привет мир.")
+        Messages(role=MessagesRole.USER, content="Скажи Привет мир и пушкин.")
     ]
     
     response = client.chat(Chat(messages=messages))
@@ -52,7 +52,7 @@ try:
         verify_ssl_certs=False
     )
     
-    response = llm.invoke("Скажи Привет мир всем на русском.")
+    response = llm.invoke("Скажи Привет мир всем вам на русском.")
     print(f"SUCCESS: {response}")
     
 except ImportError:
