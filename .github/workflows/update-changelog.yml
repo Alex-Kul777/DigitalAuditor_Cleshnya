@@ -1,0 +1,72 @@
+name: Update CHANGELOG from PR
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main, master]
+
+jobs:
+  update-changelog:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract PR info
+        id: pr-info
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # Extract type from PR title (e.g., "feat:", "fix:", "docs:", "test:")
+          if [[ "$PR_TITLE" =~ ^(feat|feature|add) ]]; then
+            TYPE="Added"
+          elif [[ "$PR_TITLE" =~ ^(fix|bugfix) ]]; then
+            TYPE="Fixed"
+          elif [[ "$PR_TITLE" =~ ^(change|refactor|improve|perf) ]]; then
+            TYPE="Changed"
+          elif [[ "$PR_TITLE" =~ ^(remove|delete|deprecate) ]]; then
+            TYPE="Removed"
+          elif [[ "$PR_TITLE" =~ ^(security|sec) ]]; then
+            TYPE="Security"
+          else
+            TYPE="Changed"
+          fi
+
+          # Extract description from PR title (remove type prefix)
+          DESCRIPTION="${PR_TITLE#*: }"
+          DESCRIPTION="${DESCRIPTION#*: }"
+
+          echo "type=$TYPE" >> $GITHUB_OUTPUT
+          echo "description=$DESCRIPTION" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Update CHANGELOG
+        env:
+          CHANGELOG_TYPE: ${{ steps.pr-info.outputs.type }}
+          CHANGELOG_DESC: ${{ steps.pr-info.outputs.description }}
+          PR_NUMBER: ${{ steps.pr-info.outputs.pr_number }}
+        run: |
+          python .github/scripts/update_changelog.py \
+            --type "$CHANGELOG_TYPE" \
+            --description "$CHANGELOG_DESC" \
+            --pr-number "$PR_NUMBER"
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet CHANGELOG.md; then
+            echo "ℹ️ CHANGELOG already up-to-date"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add CHANGELOG.md
+            git commit -m "docs: auto-update CHANGELOG from PR #${{ steps.pr-info.outputs.pr_number }} [skip ci]"
+            git push
+          fi

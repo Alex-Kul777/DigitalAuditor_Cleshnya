@@ -1,0 +1,27 @@
+# DigitalAuditor Cleshnya — User Preferences
+#
+# Скопируй в config/user_preferences.yaml и настрой согласно своим предпочтениям.
+# Эти параметры применяются автоматически при каждом audit run.
+#
+# Структура: глобальный уровень (этот файл) + per-task override
+# (tasks/instances/<name>/preferences.yaml переопределяет глобальный).
+
+# А — Терминология: автоматические замены применяются во всех отчётах
+terminology:
+  риск: угроза
+  # контроль: мера
+  # уязвимость: слабое место
+  # обнаружено: выявлено
+
+# Б — Формат findings
+findings_count: 5          # Количество наблюдений в отчёте (рекомендуемый диапазон 3-10)
+detail_level: standard     # Уровень детализации: brief | standard | detailed
+
+# В — Тон/стиль отчёта
+tone: official             # official (формальный) | business (деловой) | technical (технический)
+
+# Г — Структура разделов (пустые списки = все разделы включены)
+sections_include: []       # Включить только эти разделы (пусто = все)
+sections_exclude: []       # Исключить эти разделы
+#   - appendix
+#   - recommendations

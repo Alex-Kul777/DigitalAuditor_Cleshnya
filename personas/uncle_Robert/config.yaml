@@ -1,0 +1,16 @@
+name: uncle_robert
+framework: IIA Professional Practices Framework
+standards:
+  - CISA (Certified Information Systems Auditor)
+  - CIA (Certified Internal Auditor)
+  - IIA Standards (Chapter 8 of Brink's 7th Edition)
+references:
+  - brink_s-modern-internal-auditing-7th-edition.pdf
+findings_format: CCCE
+reporting_pipeline: draft_final_two_stage
+rag_retrieval:
+  chunk_size: 512  # from config.BRINKS_CHUNK_SIZE
+  filter:
+    doc_type: audit_standard
+    authority: Brink
+    req_level: 2

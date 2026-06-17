@@ -1,0 +1,5 @@
+# Persona Configuration: test_persona
+name: test_persona
+description: ""
+system_prompt_file: persona_prompt.md
+corpus_dir: corpus/

@@ -22,6 +22,16 @@ build/
 *.swp
 *.swo
 
+# Claude Code / Tools
+.omc/
+!.omc/notepad.md
+.claude/session-*
+.claude/transcripts/
+.claude/plans/
+.claude/memories/
+.claude/memory/
+.claude/worktrees/
+
 # Project specific
 chroma_db/
 vector_store/
@@ -35,6 +45,11 @@ presentation/output/
 *.log
 audit.log
 
+# Persona raw PDFs (large, sensitive)
+personas/*/raw/*.pdf
+# But DO include Markdown versions (converted docs)
+!personas/*/raw/*.md
+
 # Models
 *.gguf
 *.bin
@@ -43,3 +58,8 @@ audit.log
 # OS
 .DS_Store
 Thumbs.db
+
+# Temporary files
+tmp/
+audit.json
+test_gigachat_speed.py
